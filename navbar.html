@@ -14,8 +14,36 @@
   >
     <a href="index.html" class="hover:opacity-70 transition-opacity">Home</a>
     <a href="shop.html" class="hover:opacity-70 transition-opacity">Shop</a>
-    <!--<a href="about.html" class="hover:opacity-70 transition-opacity">About</a>-->
   </div>
 
-  <button class="md:hidden text-2xl">☰</button>
+  <button
+    id="menuBtn"
+    class="md:hidden text-2xl leading-none"
+    aria-label="Open menu"
+    aria-expanded="false"
+    aria-controls="mobileMenu"
+    type="button"
+  >
+    ☰
+  </button>
 </nav>
+
+<div
+  id="mobileMenu"
+  class="fixed top-[88px] left-0 right-0 z-40 md:hidden hidden px-6 pb-6"
+>
+  <div
+    class="rounded-2xl bg-black/70 backdrop-blur-md border border-white/10 overflow-hidden"
+  >
+    <a
+      href="index.html"
+      class="block py-4 px-5 text-sm tracking-[0.15em] uppercase font-medium hover:opacity-70 transition-opacity"
+      >Home</a
+    >
+    <a
+      href="shop.html"
+      class="block py-4 px-5 text-sm tracking-[0.15em] uppercase font-medium hover:opacity-70 transition-opacity"
+      >Shop</a
+    >
+  </div>
+</div>

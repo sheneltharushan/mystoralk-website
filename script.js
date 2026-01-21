@@ -207,6 +207,9 @@ async function loadNavbar() {
     const html = await response.text();
     container.innerHTML = html;
 
+    // init mobile menu AFTER the HTML is inserted
+    initNavbarMobile(container);
+
     const currentPath =
       window.location.pathname.split("/").pop() || "index.html";
     const links = container.querySelectorAll("a");
@@ -218,6 +221,46 @@ async function loadNavbar() {
   } catch (error) {
     console.error("Error loading navbar:", error);
   }
+}
+
+function initNavbarMobile(container) {
+  const btn = container.querySelector("#menuBtn");
+  const menu = container.querySelector("#mobileMenu");
+  if (!btn || !menu) return;
+
+  const closeMenu = () => {
+    menu.classList.add("hidden");
+    btn.setAttribute("aria-expanded", "false");
+    btn.textContent = "☰";
+  };
+
+  const toggleMenu = () => {
+    const isOpen = !menu.classList.contains("hidden");
+    if (isOpen) closeMenu();
+    else {
+      menu.classList.remove("hidden");
+      btn.setAttribute("aria-expanded", "true");
+      btn.textContent = "✕";
+    }
+  };
+
+  // prevent double listeners if loadNavbar is called again
+  btn.onclick = toggleMenu;
+
+  // close when clicking a menu link
+  menu.querySelectorAll("a").forEach((a) => {
+    a.onclick = closeMenu;
+  });
+
+  // close when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!menu.contains(e.target) && !btn.contains(e.target)) closeMenu();
+  });
+
+  // close when resizing to desktop
+  window.addEventListener("resize", () => {
+    if (window.innerWidth >= 768) closeMenu();
+  });
 }
 
 // ----------------------------------------------------
