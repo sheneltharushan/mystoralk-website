@@ -25,6 +25,8 @@
         },
       };
     </script>
+
+    <link rel="icon" href="/assets/img/logo.png" />
   </head>
   <body class="bg-mystora-black text-white antialiased overflow-x-hidden">
     <nav>
@@ -35,6 +37,15 @@
       id="hero-section"
       class="relative h-screen bg-mystora-black overflow-hidden"
     >
+      <div
+        id="scroll-indicator"
+        class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 pointer-events-none mix-blend-difference text-white/90"
+      >
+        <span class="text-[10px] tracking-[0.35em] uppercase">Scroll</span>
+        <div
+          class="w-5 h-5 rotate-45 border-r border-b border-white/90 animate-bounce"
+        ></div>
+      </div>
       <div class="w-full h-full relative">
         <!-- WebP sequence canvas -->
         <canvas

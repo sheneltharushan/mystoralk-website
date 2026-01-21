@@ -116,6 +116,47 @@ function initHeroVideoScroll() {
   const oldVideo = document.getElementById("hero-video");
   if (oldVideo) oldVideo.style.display = "none";
 
+  // Put this inside initHeroVideoScroll(), after you have "section"
+  const wrap =
+    section.querySelector(".w-full.h-full.relative") ||
+    section.querySelector(".w-full.h-full") ||
+    section;
+
+  let indicator = document.getElementById("scroll-indicator");
+
+  // Create if missing
+  if (!indicator) {
+    indicator = document.createElement("div");
+    indicator.id = "scroll-indicator";
+    indicator.className =
+      "absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 pointer-events-none text-white";
+    wrap.appendChild(indicator);
+  }
+
+  // ALWAYS replace content (fixes the “box” issue)
+  indicator.innerHTML = `
+  <span class="text-[10px] tracking-[0.35em] uppercase">SCROLL</span>
+
+  <svg width="26" height="26" viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M12 5v10" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+    <path d="M7 12l5 5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+`;
+
+  // Optional: bounce animation (works even if Tailwind animate-bounce fails)
+  const svg = indicator.querySelector("svg");
+  if (svg) {
+    svg.animate(
+      [
+        { transform: "translateY(0px)" },
+        { transform: "translateY(8px)" },
+        { transform: "translateY(0px)" },
+      ],
+      { duration: 1200, iterations: Infinity }
+    );
+  }
+
   // Find or create canvas
   let canvas = document.getElementById("hero-canvas");
   if (!canvas) {
@@ -123,7 +164,7 @@ function initHeroVideoScroll() {
     canvas.id = "hero-canvas";
     canvas.className =
       "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full object-cover z-0 opacity-0";
-    section.querySelector(".w-full.h-full.relative")?.appendChild(canvas);
+    wrap.appendChild(canvas);
   }
 
   const ctx = canvas.getContext("2d");
@@ -131,7 +172,6 @@ function initHeroVideoScroll() {
 
   const frames = new Array(HERO_FRAME_COUNT);
   const loaded = new Array(HERO_FRAME_COUNT).fill(false);
-
   let currentFrameIndex = 0;
 
   function resizeCanvasToDisplaySize() {
@@ -150,7 +190,6 @@ function initHeroVideoScroll() {
   }
 
   function drawCover(img) {
-    // draw cover into CSS pixel space
     const rect = canvas.getBoundingClientRect();
     const cw = rect.width;
     const ch = rect.height;
@@ -160,7 +199,11 @@ function initHeroVideoScroll() {
     const iw = img.naturalWidth || img.width;
     const ih = img.naturalHeight || img.height;
 
-    const scale = Math.max(cw / iw, ch / ih);
+    let scale = Math.max(cw / iw, ch / ih);
+
+    // smaller bottle on mobile
+    if (window.innerWidth < 768) scale *= 0.88;
+
     const dw = iw * scale;
     const dh = ih * scale;
 
@@ -197,9 +240,7 @@ function initHeroVideoScroll() {
 
       img.onload = () => {
         loaded[i] = true;
-        // draw first available frame as soon as possible
         if (i === 0) renderFrame(0);
-        // also render if current frame was waiting
         if (i === currentFrameIndex) renderFrame(currentFrameIndex);
       };
 
@@ -209,33 +250,40 @@ function initHeroVideoScroll() {
 
   preload();
 
-  // initial visual state: text visible, canvas hidden
+  // Initial state
   if (typeof gsap !== "undefined") {
     gsap.set(canvas, { opacity: 0 });
     if (text) gsap.set(text, { opacity: 1, y: 0 });
+    if (indicator) gsap.set(indicator, { opacity: 1, y: 0 });
   } else {
     canvas.style.opacity = "0";
     if (text) text.style.opacity = "1";
+    if (indicator) indicator.style.opacity = "1";
   }
 
-  // No GSAP fallback: fade in canvas and autoplay frames by scroll position
+  // Fallback (no GSAP)
   if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
     canvas.style.opacity = "1";
     if (text) text.style.opacity = "0";
-    window.addEventListener("scroll", () => {
+
+    const onScroll = () => {
       const rect = section.getBoundingClientRect();
-      const total = window.innerHeight * 4; // rough match to 400%
+      const total = window.innerHeight * 4;
       const progress = Math.min(1, Math.max(0, (0 - rect.top) / total));
-      const f = Math.round(progress * (HERO_FRAME_COUNT - 1));
-      renderFrame(f);
-    });
+      renderFrame(Math.round(progress * (HERO_FRAME_COUNT - 1)));
+
+      if (indicator) indicator.style.opacity = window.scrollY > 40 ? "0" : "1";
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", () => renderFrame(currentFrameIndex));
+    onScroll();
     return;
   }
 
   gsap.registerPlugin(ScrollTrigger);
 
-  // kill old triggers on this section
+  // Kill old triggers for THIS section only
   ScrollTrigger.getAll().forEach((t) => {
     if (t && t.trigger === section) t.kill();
   });
@@ -255,36 +303,28 @@ function initHeroVideoScroll() {
     },
   });
 
-  // Phase A: small scroll -> text out, canvas in
-  if (text) {
-    tl.to(text, {
-      opacity: 0,
-      y: -50,
-      duration: 1,
-      ease: "power2.inOut",
-    });
+  // ✅ Fade scroll indicator away quickly at the start of scroll
+  if (indicator) {
+    tl.to(
+      indicator,
+      { opacity: 0, y: 10, duration: 0.6, ease: "power1.out" },
+      0
+    );
   }
 
-  tl.to(
-    canvas,
-    {
-      opacity: 1,
-      duration: 1,
-      ease: "power2.inOut",
-    },
-    "<"
-  );
+  // Phase A: text out + canvas in
+  if (text) {
+    tl.to(text, { opacity: 0, y: -50, duration: 1, ease: "power2.inOut" }, 0);
+  }
+
+  tl.to(canvas, { opacity: 1, duration: 1, ease: "power2.inOut" }, 0);
 
   // Phase B: scrub frames
   tl.to(playhead, {
     frame: HERO_FRAME_COUNT - 1,
     duration: 8,
     ease: "none",
-    onUpdate: () => {
-      // set integer frame and render
-      const f = Math.round(playhead.frame);
-      renderFrame(f);
-    },
+    onUpdate: () => renderFrame(Math.round(playhead.frame)),
   });
 
   window.addEventListener("resize", () => {
