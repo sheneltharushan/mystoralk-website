@@ -8,29 +8,22 @@ let supabaseClient;
 let currentProductData = null;
 let selectedSize = "50ml";
 
-// Hero globals
-let heroCanvas = null;
-let heroContext = null;
-let heroImages = [];
-let heroSequence = { frame: 0 };
-let heroTl = null;
-
-const HERO_FRAME_COUNT = 192;
-
 const SIZE_CONFIG = {
   "10ml": { priceKey: "price_10ml", imageKey: "image_10ml" },
   "50ml": { priceKey: "price_50ml", imageKey: "image_50ml" },
   "100ml": { priceKey: "price_100ml", imageKey: "image_100ml" },
 };
 
+// Lenis global (so ScrollTrigger can sync)
+let lenisInstance = null;
+
 // ----------------------------------------------------
 // 0.1) SLUG HELPERS
 // ----------------------------------------------------
 function getProductLink(product) {
-  // Prefer slug, fallback to id
   if (product?.slug)
-    return `product.html?slug=${encodeURIComponent(product.slug)}`;
-  return `product.html?id=${product.id}`;
+    return `/product/?slug=${encodeURIComponent(product.slug)}`;
+  return `/product/?id=${product.id}`;
 }
 
 // ----------------------------------------------------
@@ -53,168 +46,276 @@ try {
 // 2) DOM READY BOOTSTRAP
 // ----------------------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
-  initLenis();
+  initLenis(); // important: must run before hero ScrollTrigger setup
 
   loadNavbar();
 
-  // Index page sections (they silently return if elements are missing)
   loadFeaturedProducts();
   loadSpecialProducts();
 
-  // Hero animation (silently returns if canvas missing)
-  initHeroAnimation();
+  initHeroVideoScroll();
 
-  // Product page logic (silently returns if not product page)
   initProductPage();
-
-  // Shop page logic (silently returns if not shop page)
   initShopPage();
 });
 
 // ----------------------------------------------------
-// 3) LENIS
+// 3) LENIS (with ScrollTrigger sync)
 // ----------------------------------------------------
 function initLenis() {
   if (typeof Lenis === "undefined") return;
 
-  const lenis = new Lenis({
+  lenisInstance = new Lenis({
     duration: 1.2,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     smooth: true,
   });
 
   function raf(time) {
-    lenis.raf(time);
+    lenisInstance.raf(time);
     requestAnimationFrame(raf);
   }
   requestAnimationFrame(raf);
+
+  // If GSAP/ScrollTrigger exists, sync them
+  if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Update ScrollTrigger on Lenis scroll
+    lenisInstance.on("scroll", ScrollTrigger.update);
+
+    // Ensure GSAP ticker drives Lenis too (helps with pin/scrub smoothness)
+    gsap.ticker.add((time) => {
+      lenisInstance.raf(time * 1000);
+    });
+    gsap.ticker.lagSmoothing(0);
+
+    // Optional: if you use a custom scroll container, you'd add scrollerProxy here.
+    // For most Lenis setups, this is enough.
+  }
 }
 
 // ----------------------------------------------------
-// 4) HERO
+// HERO WEBP SEQUENCE SCROLL (001.webp ... 192.webp) in /assets/frames/
 // ----------------------------------------------------
-function initHeroAnimation() {
-  heroCanvas = document.getElementById("hero-canvas");
-  if (!heroCanvas) return;
 
-  heroContext = heroCanvas.getContext("2d");
-  if (!heroContext) return;
+const HERO_FRAME_COUNT = 192;
 
-  heroCanvas.width = 1920;
-  heroCanvas.height = 1080;
+// ✅ your filenames: 001.webp, 002.webp ... 192.webp
+function heroFrameSrc(i) {
+  const n = String(i + 1).padStart(3, "0"); // 001..192
+  return `/assets/frames/${n}.webp`;
+}
 
-  heroImages = [];
-  heroSequence = { frame: 0 };
+function initHeroVideoScroll() {
+  const section = document.getElementById("hero-section");
+  const text = document.getElementById("hero-text-container");
+  if (!section) return;
 
-  const currentFrame = (index) =>
-    `assets/frames/${(index + 1).toString().padStart(3, "0")}.png`;
+  // Hide <video> if it still exists
+  const oldVideo = document.getElementById("hero-video");
+  if (oldVideo) oldVideo.style.display = "none";
 
-  for (let i = 0; i < HERO_FRAME_COUNT; i++) {
-    const img = new Image();
-    img.src = currentFrame(i);
-    if (i === 0) img.onload = heroRender;
-    heroImages.push(img);
+  // Find or create canvas
+  let canvas = document.getElementById("hero-canvas");
+  if (!canvas) {
+    canvas = document.createElement("canvas");
+    canvas.id = "hero-canvas";
+    canvas.className =
+      "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full object-cover z-0 opacity-0";
+    section.querySelector(".w-full.h-full.relative")?.appendChild(canvas);
   }
 
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  const frames = new Array(HERO_FRAME_COUNT);
+  const loaded = new Array(HERO_FRAME_COUNT).fill(false);
+
+  let currentFrameIndex = 0;
+
+  function resizeCanvasToDisplaySize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const rect = canvas.getBoundingClientRect();
+
+    const w = Math.max(1, Math.floor(rect.width * dpr));
+    const h = Math.max(1, Math.floor(rect.height * dpr));
+
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+    }
+  }
+
+  function drawCover(img) {
+    // draw cover into CSS pixel space
+    const rect = canvas.getBoundingClientRect();
+    const cw = rect.width;
+    const ch = rect.height;
+
+    ctx.clearRect(0, 0, cw, ch);
+
+    const iw = img.naturalWidth || img.width;
+    const ih = img.naturalHeight || img.height;
+
+    const scale = Math.max(cw / iw, ch / ih);
+    const dw = iw * scale;
+    const dh = ih * scale;
+
+    const dx = (cw - dw) / 2;
+    const dy = (ch - dh) / 2;
+
+    ctx.drawImage(img, dx, dy, dw, dh);
+  }
+
+  let rafPending = false;
+  function renderFrame(i) {
+    const idx = Math.max(0, Math.min(HERO_FRAME_COUNT - 1, i | 0));
+    currentFrameIndex = idx;
+
+    const img = frames[idx];
+    if (!img || !loaded[idx]) return;
+
+    if (rafPending) return;
+    rafPending = true;
+
+    requestAnimationFrame(() => {
+      rafPending = false;
+      resizeCanvasToDisplaySize();
+      drawCover(img);
+    });
+  }
+
+  function preload() {
+    for (let i = 0; i < HERO_FRAME_COUNT; i++) {
+      const img = new Image();
+      img.decoding = "async";
+      img.loading = "eager";
+      img.src = heroFrameSrc(i);
+
+      img.onload = () => {
+        loaded[i] = true;
+        // draw first available frame as soon as possible
+        if (i === 0) renderFrame(0);
+        // also render if current frame was waiting
+        if (i === currentFrameIndex) renderFrame(currentFrameIndex);
+      };
+
+      frames[i] = img;
+    }
+  }
+
+  preload();
+
+  // initial visual state: text visible, canvas hidden
+  if (typeof gsap !== "undefined") {
+    gsap.set(canvas, { opacity: 0 });
+    if (text) gsap.set(text, { opacity: 1, y: 0 });
+  } else {
+    canvas.style.opacity = "0";
+    if (text) text.style.opacity = "1";
+  }
+
+  // No GSAP fallback: fade in canvas and autoplay frames by scroll position
   if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
-    window.addEventListener("resize", heroRender);
+    canvas.style.opacity = "1";
+    if (text) text.style.opacity = "0";
+    window.addEventListener("scroll", () => {
+      const rect = section.getBoundingClientRect();
+      const total = window.innerHeight * 4; // rough match to 400%
+      const progress = Math.min(1, Math.max(0, (0 - rect.top) / total));
+      const f = Math.round(progress * (HERO_FRAME_COUNT - 1));
+      renderFrame(f);
+    });
+    window.addEventListener("resize", () => renderFrame(currentFrameIndex));
     return;
   }
 
   gsap.registerPlugin(ScrollTrigger);
 
-  if (document.querySelector("#hero-text-container")) {
-    gsap.set("#hero-text-container", { opacity: 1, y: 0 });
-  }
-  gsap.set("#hero-canvas", { opacity: 0 });
+  // kill old triggers on this section
+  ScrollTrigger.getAll().forEach((t) => {
+    if (t && t.trigger === section) t.kill();
+  });
 
-  heroTl = gsap.timeline({
+  const playhead = { frame: 0 };
+
+  const tl = gsap.timeline({
     scrollTrigger: {
-      trigger: "#hero-section",
+      trigger: section,
       start: "top top",
       end: "+=400%",
       scrub: 1,
       pin: true,
       anticipatePin: 1,
+      invalidateOnRefresh: true,
+      onRefresh: () => renderFrame(currentFrameIndex),
     },
   });
 
-  heroTl.to("#hero-text-container", {
-    opacity: 0,
-    y: -50,
-    duration: 1,
-    ease: "power2.inOut",
-  });
+  // Phase A: small scroll -> text out, canvas in
+  if (text) {
+    tl.to(text, {
+      opacity: 0,
+      y: -50,
+      duration: 1,
+      ease: "power2.inOut",
+    });
+  }
 
-  heroTl.to(
-    "#hero-canvas",
-    { opacity: 1, duration: 1, ease: "power2.inOut" },
-    "-=0.5"
+  tl.to(
+    canvas,
+    {
+      opacity: 1,
+      duration: 1,
+      ease: "power2.inOut",
+    },
+    "<"
   );
 
-  heroTl.to(heroSequence, {
+  // Phase B: scrub frames
+  tl.to(playhead, {
     frame: HERO_FRAME_COUNT - 1,
-    snap: "frame",
-    ease: "none",
     duration: 8,
-    onUpdate: heroRender,
+    ease: "none",
+    onUpdate: () => {
+      // set integer frame and render
+      const f = Math.round(playhead.frame);
+      renderFrame(f);
+    },
   });
 
-  window.addEventListener("resize", heroRender);
-}
-
-function heroRender() {
-  if (!heroCanvas || !heroContext) return;
-
-  const safeFrame = Math.max(
-    0,
-    Math.min(heroSequence.frame, HERO_FRAME_COUNT - 1)
-  );
-  const img = heroImages[safeFrame];
-  if (!img || !img.complete) return;
-
-  heroContext.clearRect(0, 0, heroCanvas.width, heroCanvas.height);
-
-  const hRatio = heroCanvas.width / img.width;
-  const vRatio = heroCanvas.height / img.height;
-  const ratio = Math.max(hRatio, vRatio);
-
-  const centerShiftX = (heroCanvas.width - img.width * ratio) / 2;
-  const centerShiftY = (heroCanvas.height - img.height * ratio) / 2;
-
-  heroContext.drawImage(
-    img,
-    0,
-    0,
-    img.width,
-    img.height,
-    centerShiftX,
-    centerShiftY,
-    img.width * ratio,
-    img.height * ratio
-  );
+  window.addEventListener("resize", () => {
+    ScrollTrigger.refresh();
+    renderFrame(currentFrameIndex);
+  });
 }
 
 // ----------------------------------------------------
-// 5) NAVBAR LOADER
+// 5) NAVBAR LOADER (updated for folder routes)
 // ----------------------------------------------------
 async function loadNavbar() {
   const container = document.getElementById("navbar-container");
   if (!container) return;
 
   try {
-    const response = await fetch("navbar.html");
+    const response = await fetch("/navbar.html");
     const html = await response.text();
     container.innerHTML = html;
 
-    // init mobile menu AFTER the HTML is inserted
     initNavbarMobile(container);
 
-    const currentPath =
-      window.location.pathname.split("/").pop() || "index.html";
+    const currentPath = window.location.pathname;
+    const normalize = (p) => (p.endsWith("/") ? p : p + "/");
+
     const links = container.querySelectorAll("a");
     links.forEach((link) => {
-      if (link.getAttribute("href") === currentPath) {
+      const href = link.getAttribute("href") || "";
+      if (!href.startsWith("/")) return;
+
+      if (normalize(href) === normalize(currentPath)) {
         link.classList.add("opacity-50", "pointer-events-none");
       }
     });
@@ -234,7 +335,9 @@ function initNavbarMobile(container) {
     btn.textContent = "☰";
   };
 
-  const toggleMenu = () => {
+  const toggleMenu = (e) => {
+    if (e) e.stopPropagation();
+
     const isOpen = !menu.classList.contains("hidden");
     if (isOpen) closeMenu();
     else {
@@ -244,20 +347,16 @@ function initNavbarMobile(container) {
     }
   };
 
-  // prevent double listeners if loadNavbar is called again
   btn.onclick = toggleMenu;
 
-  // close when clicking a menu link
   menu.querySelectorAll("a").forEach((a) => {
     a.onclick = closeMenu;
   });
 
-  // close when clicking outside
   document.addEventListener("click", (e) => {
     if (!menu.contains(e.target) && !btn.contains(e.target)) closeMenu();
   });
 
-  // close when resizing to desktop
   window.addEventListener("resize", () => {
     if (window.innerWidth >= 768) closeMenu();
   });
@@ -495,7 +594,6 @@ function hydrateProductUI(product) {
   fetchSimilar(product.category, product.id);
 }
 
-// Thumbnails: sizes switch variant, promo only switches image
 function renderThumbnails(product) {
   const thumbList = document.getElementById("thumbnail-list");
   if (!thumbList) return;
@@ -532,7 +630,6 @@ function renderThumbnails(product) {
   });
 }
 
-// Size buttons call this
 function updateSize(size) {
   selectedSize = size;
 
@@ -563,7 +660,6 @@ function updateWhatsAppLink() {
   btn.href = `https://wa.me/${phone}?text=${text}`;
 }
 
-// Similar products
 async function fetchSimilar(category, currentId) {
   if (!supabaseClient) return;
 
@@ -607,7 +703,7 @@ async function fetchSimilar(category, currentId) {
 }
 
 // ----------------------------------------------------
-// 11) SHOP PAGE (shop.html)
+// 11) SHOP PAGE (/shop/)
 // ----------------------------------------------------
 let shopAllProducts = [];
 let shopViewProducts = [];
@@ -676,24 +772,20 @@ function shopSort(list, sortVal) {
     arr.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     return arr;
   }
-
   if (sortVal === "price_asc") {
     arr.sort((a, b) => shopCardPrice(a) - shopCardPrice(b));
     return arr;
   }
-
   if (sortVal === "price_desc") {
     arr.sort((a, b) => shopCardPrice(b) - shopCardPrice(a));
     return arr;
   }
-
   if (sortVal === "name_asc") {
     arr.sort((a, b) =>
       shopNormalize(a.name).localeCompare(shopNormalize(b.name))
     );
     return arr;
   }
-
   if (sortVal === "name_desc") {
     arr.sort((a, b) =>
       shopNormalize(b.name).localeCompare(shopNormalize(a.name))
