@@ -96,14 +96,21 @@ function initLenis() {
 }
 
 // ----------------------------------------------------
-// HERO WEBP SEQUENCE SCROLL (001.webp ... 192.webp) in /assets/frames/
+// HERO WEBP SEQUENCE SCROLL (060.webp ... 192.webp) in /assets/frames/
+// Shorter scroll: cut animation distance roughly in half
 // ----------------------------------------------------
 
-const HERO_FRAME_COUNT = 192;
+// ✅ Frames now start at 060.webp and end at 192.webp
+const HERO_START_FRAME = 60; // file 060.webp
+const HERO_END_FRAME = 192; // file 192.webp
 
-// ✅ your filenames: 001.webp, 002.webp ... 192.webp
+// Count how many frames exist in the new range
+const HERO_FRAME_COUNT = HERO_END_FRAME - HERO_START_FRAME + 1;
+
+// ✅ filenames: 060.webp ... 192.webp
 function heroFrameSrc(i) {
-  const n = String(i + 1).padStart(3, "0"); // 001..192
+  const fileNumber = HERO_START_FRAME + i; // 60..192
+  const n = String(fileNumber).padStart(3, "0");
   return `/assets/frames/${n}.webp`;
 }
 
@@ -116,7 +123,6 @@ function initHeroVideoScroll() {
   const oldVideo = document.getElementById("hero-video");
   if (oldVideo) oldVideo.style.display = "none";
 
-  // Put this inside initHeroVideoScroll(), after you have "section"
   const wrap =
     section.querySelector(".w-full.h-full.relative") ||
     section.querySelector(".w-full.h-full") ||
@@ -124,7 +130,6 @@ function initHeroVideoScroll() {
 
   let indicator = document.getElementById("scroll-indicator");
 
-  // Create if missing
   if (!indicator) {
     indicator = document.createElement("div");
     indicator.id = "scroll-indicator";
@@ -133,18 +138,15 @@ function initHeroVideoScroll() {
     wrap.appendChild(indicator);
   }
 
-  // ALWAYS replace content (fixes the “box” issue)
   indicator.innerHTML = `
-  <span class="text-[10px] tracking-[0.35em] uppercase">SCROLL</span>
+    <span class="text-[10px] tracking-[0.35em] uppercase">SCROLL</span>
+    <svg width="26" height="26" viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M12 5v10" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+      <path d="M7 12l5 5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  `;
 
-  <svg width="26" height="26" viewBox="0 0 24 24"
-    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="M12 5v10" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-    <path d="M7 12l5 5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-`;
-
-  // Optional: bounce animation (works even if Tailwind animate-bounce fails)
   const svg = indicator.querySelector("svg");
   if (svg) {
     svg.animate(
@@ -153,7 +155,7 @@ function initHeroVideoScroll() {
         { transform: "translateY(8px)" },
         { transform: "translateY(0px)" },
       ],
-      { duration: 1200, iterations: Infinity }
+      { duration: 1200, iterations: Infinity },
     );
   }
 
@@ -268,7 +270,10 @@ function initHeroVideoScroll() {
 
     const onScroll = () => {
       const rect = section.getBoundingClientRect();
-      const total = window.innerHeight * 4;
+
+      // ✅ was 4 screens; now 2 screens (half)
+      const total = window.innerHeight * 2;
+
       const progress = Math.min(1, Math.max(0, (0 - rect.top) / total));
       renderFrame(Math.round(progress * (HERO_FRAME_COUNT - 1)));
 
@@ -294,7 +299,10 @@ function initHeroVideoScroll() {
     scrollTrigger: {
       trigger: section,
       start: "top top",
-      end: "+=400%",
+
+      // ✅ was "+=400%"; now "+=200%" (half the scroll length)
+      end: "+=200%",
+
       scrub: 1,
       pin: true,
       anticipatePin: 1,
@@ -303,23 +311,23 @@ function initHeroVideoScroll() {
     },
   });
 
-  // ✅ Fade scroll indicator away quickly at the start of scroll
+  // Fade indicator early
   if (indicator) {
     tl.to(
       indicator,
       { opacity: 0, y: 10, duration: 0.6, ease: "power1.out" },
-      0
+      0,
     );
   }
 
-  // Phase A: text out + canvas in
+  // Text out + canvas in
   if (text) {
     tl.to(text, { opacity: 0, y: -50, duration: 1, ease: "power2.inOut" }, 0);
   }
 
   tl.to(canvas, { opacity: 1, duration: 1, ease: "power2.inOut" }, 0);
 
-  // Phase B: scrub frames
+  // Scrub frames (same timing inside the shorter scroll)
   tl.to(playhead, {
     frame: HERO_FRAME_COUNT - 1,
     duration: 8,
@@ -448,7 +456,7 @@ async function loadFeaturedProducts() {
         <p class="text-xs text-gray-400 uppercase tracking-widest mb-3">LKR ${displayPrice.toLocaleString()}</p>
 
         <a href="${getProductLink(
-          product
+          product,
         )}" onclick="event.stopPropagation()" class="inline-block text-[10px] uppercase tracking-[0.2em] border-b border-white pb-1 hover:text-gray-400 hover:border-gray-400 transition-colors">
           Order Now
         </a>
@@ -504,7 +512,7 @@ async function loadSpecialProducts() {
         <p class="text-xs text-gray-500 uppercase tracking-widest mb-4">LKR ${displayPrice.toLocaleString()}</p>
 
         <a href="${getProductLink(
-          product
+          product,
         )}" onclick="event.stopPropagation()" class="inline-block text-[10px] uppercase tracking-[0.2em] border-b border-black pb-1 hover:opacity-50 transition-opacity">
           Order Now
         </a>
@@ -542,7 +550,7 @@ function getVariant(product, size) {
   const cfg = SIZE_CONFIG[size] || SIZE_CONFIG["50ml"];
 
   const price = Number(
-    product?.[cfg.priceKey] ?? product?.price_50ml ?? product?.price ?? 0
+    product?.[cfg.priceKey] ?? product?.price_50ml ?? product?.price ?? 0,
   );
 
   const image =
@@ -694,7 +702,7 @@ function updateWhatsAppLink() {
 
   const phone = "94701436936";
   const text = encodeURIComponent(
-    `Hi Mystora, I would like to order ${currentProductData.name} (${selectedSize}).`
+    `Hi Mystora, I would like to order ${currentProductData.name} (${selectedSize}).`,
   );
 
   btn.href = `https://wa.me/${phone}?text=${text}`;
@@ -822,13 +830,13 @@ function shopSort(list, sortVal) {
   }
   if (sortVal === "name_asc") {
     arr.sort((a, b) =>
-      shopNormalize(a.name).localeCompare(shopNormalize(b.name))
+      shopNormalize(a.name).localeCompare(shopNormalize(b.name)),
     );
     return arr;
   }
   if (sortVal === "name_desc") {
     arr.sort((a, b) =>
-      shopNormalize(b.name).localeCompare(shopNormalize(a.name))
+      shopNormalize(b.name).localeCompare(shopNormalize(a.name)),
     );
     return arr;
   }
@@ -844,10 +852,10 @@ function applyShopFilters() {
   const results = document.getElementById("shop-results");
 
   const searchVal = shopNormalize(
-    document.getElementById("shop-search")?.value
+    document.getElementById("shop-search")?.value,
   );
   const categoryVal = shopNormalize(
-    document.getElementById("shop-category")?.value
+    document.getElementById("shop-category")?.value,
   );
   const sortVal = document.getElementById("shop-sort")?.value || "newest";
 
@@ -855,13 +863,13 @@ function applyShopFilters() {
 
   if (searchVal) {
     filtered = filtered.filter((p) =>
-      shopNormalize(p.name).includes(searchVal)
+      shopNormalize(p.name).includes(searchVal),
     );
   }
 
   if (categoryVal && categoryVal !== "all") {
     filtered = filtered.filter(
-      (p) => shopNormalize(p.category) === categoryVal
+      (p) => shopNormalize(p.category) === categoryVal,
     );
   }
 

@@ -13,3 +13,109 @@ html.lenis body {
 .lenis.lenis-stopped {
   overflow: hidden;
 }
+
+/* Fonts */
+@font-face {
+  font-family: "GothamBlack";
+  src: url("/assets/fonts/GOTHAM-BLACK.TTF") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "GothamLight";
+  src: url("/assets/fonts/Gotham-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "GothamExtraLight";
+  src: url("/assets/fonts/Gotham-ExtraLight.otf") format("opentype");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-gotham-black {
+  font-family:
+    "GothamBlack",
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Arial,
+    sans-serif;
+}
+.font-gotham-light {
+  font-family:
+    "GothamLight",
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Arial,
+    sans-serif;
+}
+.font-gotham-extralight {
+  font-family:
+    "GothamExtraLight",
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Arial,
+    sans-serif;
+}
+
+/* Hashtag strip marquee */
+.hashtag-marquee {
+  position: relative;
+  width: 100%;
+  padding: 34px 0;
+}
+
+.hashtag-track {
+  display: flex;
+  align-items: center;
+  gap: 120px;
+  width: max-content;
+  animation: mystora-marquee 18s linear infinite;
+  will-change: transform;
+}
+
+.hashtag-item {
+  font-family:
+    "GothamLight",
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Arial,
+    sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: clamp(28px, 5vw, 56px);
+  color: #ffffff;
+  opacity: 0.95;
+  white-space: nowrap;
+}
+
+.hashtag-marquee:hover .hashtag-track {
+  animation-play-state: paused;
+}
+
+@keyframes mystora-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 640px) {
+  .hashtag-marquee {
+    padding: 22px 0;
+  }
+  .hashtag-track {
+    gap: 64px;
+    animation-duration: 14s;
+  }
+}

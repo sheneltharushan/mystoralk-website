@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -39,7 +39,7 @@
     >
       <div
         id="scroll-indicator"
-        class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 pointer-events-none mix-blend-difference text-white/90"
+        class="absolute bottom-14 md:bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 pointer-events-none mix-blend-difference text-white/90"
       >
         <span class="text-[10px] tracking-[0.35em] uppercase">Scroll</span>
         <div
@@ -79,7 +79,9 @@
             >
               Our Favorites
             </span>
-            <h2 class="text-3xl md:text-5xl font-brand text-white">
+            <h2
+              class="text-3xl md:text-5xl text-white font-gotham-light tracking-[0.06em]"
+            >
               Featured Selection
             </h2>
           </div>
@@ -98,7 +100,29 @@
         ></div>
       </div>
     </section>
+    <!-- Hashtag Carousel Strip -->
+    <section class="bg-mystora-black py-10">
+      <div class="border-y border-neutral-800 overflow-hidden">
+        <div class="hashtag-marquee">
+          <div class="hashtag-track">
+            <span class="hashtag-item">#MYSTORA</span>
+            <span class="hashtag-item">#MYSTORA</span>
+            <span class="hashtag-item">#MYSTORA</span>
+            <span class="hashtag-item">#MYSTORA</span>
+            <span class="hashtag-item">#MYSTORA</span>
+            <span class="hashtag-item">#MYSTORA</span>
 
+            <!-- duplicate set for seamless loop -->
+            <span class="hashtag-item">#MYSTORA</span>
+            <span class="hashtag-item">#MYSTORA</span>
+            <span class="hashtag-item">#MYSTORA</span>
+            <span class="hashtag-item">#MYSTORA</span>
+            <span class="hashtag-item">#MYSTORA</span>
+            <span class="hashtag-item">#MYSTORA</span>
+          </div>
+        </div>
+      </div>
+    </section>
     <section
       id="special"
       class="py-32 px-6 md:px-12 bg-white text-black relative"
@@ -109,9 +133,12 @@
             class="text-xs font-bold tracking-[0.5em] uppercase text-gray-500 mb-6 block"
             >Exclusive to Mystora</span
           >
-          <h2 class="text-5xl md:text-7xl font-brand mb-6">
+          <h2
+            class="text-4xl sm:text-5xl md:text-7xl mb-6 font-gotham-light tracking-[0.06em] uppercase"
+          >
             The Special Collection
           </h2>
+
           <p class="max-w-md mx-auto text-gray-600 leading-relaxed">
             Unique blends crafted by our master perfumers. Not a clone, but an
             original statement.
@@ -122,6 +149,148 @@
           id="special-grid"
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12"
         ></div>
+      </div>
+    </section>
+
+    <!-- Why You'll Love Mystora + Our Mission (combined) -->
+    <section class="bg-white text-black py-28 px-6 md:px-12">
+      <div class="max-w-7xl mx-auto">
+        <!-- Heading -->
+        <div class="text-center mb-16">
+          <h2
+            class="text-4xl md:text-6xl font-gotham-light tracking-[0.06em] uppercase"
+          >
+            Why You'll Love Mystora
+          </h2>
+          <p
+            class="mt-4 text-sm md:text-base text-gray-600 tracking-wide font-gotham-extralight"
+          >
+            Premium inspired scents and originals, crafted to feel expensive
+            without the price tag.
+          </p>
+        </div>
+
+        <!-- Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Card 1 -->
+          <div class="bg-neutral-100 border border-neutral-200 p-10 md:p-12">
+            <h3
+              class="text-2xl md:text-3xl font-gotham-light tracking-[0.1em] uppercase text-center"
+            >
+              Luxury Inspired, Done Right
+            </h3>
+            <p
+              class="mt-6 text-center text-gray-700 leading-relaxed font-gotham-extralight text-[15px] md:text-[16px]"
+            >
+              Love the vibe of designer fragrances but not the price. Mystora
+              captures the same mood and signature style, made for everyday
+              wear.
+            </p>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="bg-neutral-100 border border-neutral-200 p-10 md:p-12">
+            <h3
+              class="text-2xl md:text-3xl font-gotham-light tracking-[0.1em] uppercase text-center"
+            >
+              Strong Performance
+            </h3>
+            <p
+              class="mt-6 text-center text-gray-700 leading-relaxed font-gotham-extralight text-[15px] md:text-[16px]"
+            >
+              Built to last through your day. From lectures to late nights, our
+              blends are designed to stay present, not disappear in an hour.
+            </p>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="bg-neutral-100 border border-neutral-200 p-10 md:p-12">
+            <h3
+              class="text-2xl md:text-3xl font-gotham-light tracking-[0.1em] uppercase text-center"
+            >
+              Try Before You Commit
+            </h3>
+            <p
+              class="mt-6 text-center text-gray-700 leading-relaxed font-gotham-extralight text-[15px] md:text-[16px]"
+            >
+              Not sure what fits you. Start with 10ml to test it properly, then
+              move up to 50ml or 100ml once you are sure.
+            </p>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="bg-neutral-100 border border-neutral-200 p-10 md:p-12">
+            <h3
+              class="text-2xl md:text-3xl font-gotham-light tracking-[0.1em] uppercase text-center"
+            >
+              Easy Ordering
+            </h3>
+            <p
+              class="mt-6 text-center text-gray-700 leading-relaxed font-gotham-extralight text-[15px] md:text-[16px]"
+            >
+              See the scent, pick your size, and order in seconds through
+              WhatsApp. Fast replies, clear pricing, and smooth delivery across
+              Sri Lanka.
+            </p>
+          </div>
+        </div>
+
+        <!-- Mission -->
+        <div class="mt-24 grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+          <!-- Image (4:5) -->
+          <div class="overflow-hidden border border-neutral-200 bg-neutral-100">
+            <div class="aspect-[4/5] w-full">
+              <img
+                src="assets/img/warga.png"
+                alt="Mystora mission"
+                class="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
+          <!-- Text -->
+          <div class="max-w-xl">
+            <p
+              class="text-[10px] tracking-[0.45em] uppercase text-gray-500 font-gotham-light mb-4"
+            >
+              Our Mission
+            </p>
+
+            <h3
+              class="text-4xl md:text-5xl font-gotham-light tracking-[0.06em] uppercase mb-8"
+            >
+              Luxury, made reachable
+            </h3>
+
+            <div
+              class="space-y-6 text-gray-700 leading-relaxed font-gotham-extralight text-[15px] md:text-[16px]"
+            >
+              <p>
+                Mystora exists to bring that high-end feeling to everyone.
+                Inspired scents when you want the designer vibe, and originals
+                when you want something only you wear.
+              </p>
+              <p>
+                We focus on blends that smell premium, perform well, and feel
+                confident from the first spray to the last.
+              </p>
+              <p>
+                Simple choices, clean presentation, and sizes that let you test
+                properly before you commit.
+              </p>
+            </div>
+
+            <!-- Buttons (only once) -->
+            <div class="mt-10 flex flex-wrap gap-3">
+              <a
+                href="shop/"
+                class="inline-block bg-black text-white px-8 py-4 text-[11px] uppercase tracking-[0.35em] font-gotham-light hover:bg-neutral-900 transition-colors"
+              >
+                Explore the collection
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
