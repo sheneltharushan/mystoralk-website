@@ -700,7 +700,7 @@ function updateWhatsAppLink() {
   const btn = document.getElementById("whatsapp-order-btn");
   if (!btn) return;
 
-  const phone = "94701436936";
+  const phone = "94768253595";
   const text = encodeURIComponent(
     `Hi Mystora, I would like to order ${currentProductData.name} (${selectedSize}).`,
   );
