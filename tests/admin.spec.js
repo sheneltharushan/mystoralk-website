@@ -19,6 +19,14 @@ test("admin login validates credentials before making an authentication request"
   await expect(page.locator("#admin-app")).toBeHidden();
 });
 
+test("password recovery mode keeps the password form in front of the dashboard", async ({ page }) => {
+  await page.goto("/admin/#type=recovery");
+
+  await expect(page.getByRole("heading", { name: "Choose a new password." })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Set new password" })).toBeVisible();
+  await expect(page.locator("#admin-app")).toBeHidden();
+});
+
 test("admin page ships restrictive indexing and content policies", async ({ page }) => {
   await page.goto("/admin/");
 

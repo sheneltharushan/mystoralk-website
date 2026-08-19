@@ -16,6 +16,7 @@ const state = {
   activity: [],
   media: [],
   confirmResolver: null,
+  recoveryMode: new URLSearchParams(window.location.hash.slice(1)).get("type") === "recovery",
 };
 
 const VIEW_META = {
@@ -162,15 +163,24 @@ async function initialize() {
         storageKey: "mystora-admin-session",
       },
     });
+    if (state.recoveryMode) showPasswordRecoveryForm();
 
     state.client.auth.onAuthStateChange((event, session) => {
       state.session = session;
-      if (event === "PASSWORD_RECOVERY") showPasswordRecoveryForm();
+      if (event === "PASSWORD_RECOVERY") {
+        state.recoveryMode = true;
+        showPasswordRecoveryForm();
+      }
     });
 
     const { data, error } = await state.client.auth.getSession();
     if (error) throw error;
-    if (data.session) await enterAdmin(data.session);
+    if (data.session) {
+      if (state.recoveryMode) showPasswordRecoveryForm();
+      else await enterAdmin(data.session);
+    } else if (state.recoveryMode) {
+      setFormStatus($("#auth-status"), "This recovery link is invalid or has expired. Request a new email and try again.", "error");
+    }
   } catch {
     setFormStatus($("#auth-status"), "The admin service is unavailable. Please refresh and try again.", "error");
   }
@@ -299,7 +309,12 @@ async function handlePasswordResetRequest() {
 
 function showPasswordRecoveryForm() {
   const form = $("#login-form");
+  if (form.dataset.mode === "recovery") return;
+  form.dataset.mode = "recovery";
   clear(form);
+  $("#auth-title").textContent = "Choose a new password.";
+  $(".auth-intro").textContent = "Create a secure password for your Mystora staff account.";
+  $("#reset-password-button").hidden = true;
   const password = createElement("input", {
     attributes: { type: "password", name: "new_password", autocomplete: "new-password", minlength: "12", maxlength: "128", required: "" },
   });
@@ -308,20 +323,26 @@ function showPasswordRecoveryForm() {
     createElement("button", { className: "button button--primary", text: "Set new password", attributes: { type: "submit" } }),
   );
   form.removeEventListener("submit", handleLogin);
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    if (!form.reportValidity()) return;
-    setBusy(form, true);
-    const { error } = await state.client.auth.updateUser({ password: password.value });
-    setBusy(form, false);
-    if (error) {
-      setFormStatus($("#auth-status"), "The password could not be updated.", "error");
-    } else {
-      setFormStatus($("#auth-status"), "Password updated. Reloading your workspace…", "success");
-      const { data } = await state.client.auth.getSession();
-      if (data.session) await enterAdmin(data.session);
-    }
-  }, { once: true });
+  form.addEventListener("submit", handlePasswordUpdate);
+  password.focus();
+}
+
+async function handlePasswordUpdate(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  if (!form.reportValidity()) return;
+  setBusy(form, true);
+  const password = form.elements.new_password.value;
+  const { error } = await state.client.auth.updateUser({ password });
+  setBusy(form, false);
+  if (error) {
+    setFormStatus($("#auth-status"), "The password could not be updated. Request a new recovery email and try again.", "error");
+    return;
+  }
+
+  state.recoveryMode = false;
+  setFormStatus($("#auth-status"), "Password updated. Opening your workspace…", "success");
+  window.location.replace(`${window.location.pathname}${window.location.search}`);
 }
 
 async function loadAllData() {
