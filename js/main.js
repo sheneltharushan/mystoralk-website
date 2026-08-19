@@ -12,7 +12,11 @@ function safelyInitialize(name, initializer) {
 }
 
 safelyInitialize("Smooth scrolling", initSmoothScroll);
-safelyInitialize("Navigation", loadNavbar);
+safelyInitialize("Navigation and settings", async () => {
+  await loadNavbar();
+  const { initPublicSettings } = await import("./settings.js");
+  await initPublicSettings();
+});
 safelyInitialize("Footer newsletter", initFooterNewsletter);
 
 if (document.getElementById("featured-rail")) {

@@ -18,7 +18,10 @@ async function loadHomepageCatalog(featuredRail) {
 
   try {
     const client = getSupabaseClient();
-    const { data, error } = await client
+    const curated = await loadCuratedNewArrivals(client);
+    const { data, error } = curated?.length
+      ? { data: curated, error: null }
+      : await client
       .from("products")
       .select(CARD_FIELDS)
       .eq("active", true)
@@ -47,6 +50,29 @@ async function loadHomepageCatalog(featuredRail) {
       tone: "dark",
       preserveLayout: true,
     });
+  }
+}
+
+async function loadCuratedNewArrivals(client) {
+  try {
+    const { data: collection, error: collectionError } = await client
+      .from("collections")
+      .select("id")
+      .eq("slug", "new-arrivals")
+      .eq("active", true)
+      .maybeSingle();
+    if (collectionError || !collection) return [];
+
+    const { data, error } = await client
+      .from("collection_products")
+      .select(`position,products!inner(${CARD_FIELDS})`)
+      .eq("collection_id", collection.id)
+      .order("position", { ascending: true })
+      .limit(10);
+    if (error) return [];
+    return (data || []).map((item) => item.products).filter(Boolean);
+  } catch {
+    return [];
   }
 }
 

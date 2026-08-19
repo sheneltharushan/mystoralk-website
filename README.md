@@ -8,6 +8,31 @@ and customers complete orders through WhatsApp.
 - `/` — homepage, featured fragrances, and the special collection
 - `/shop/` — searchable and sortable product catalog
 - `/product/?slug=example-product` — product details and size selection
+- `/admin/` — invite-only Mystora catalogue and operations workspace
+
+## Administration
+
+The admin application is intentionally separate from the public storefront. It
+uses Supabase Auth for staff sessions and database RLS for authorization. There
+is no public registration flow and a signed-in user must also have an active row
+in `public.admin_users`.
+
+The first admin release includes:
+
+- Dashboard metrics, recent orders, collection health, and activity
+- Product creation, editing, publishing, variants, prices, stock, and media
+- Ordered storefront collections, including New Arrivals
+- Manual WhatsApp enquiry and order tracking
+- Validated product-image uploads to Supabase Storage
+- Storefront WhatsApp, delivery, and social settings
+- Database-triggered audit history
+
+The reviewed database changes are kept in `supabase/admin_foundation.sql` and
+`supabase/admin_hardening.sql`. They must be applied in that order before
+`/admin/` can be used. After the schema exists, create the first user through
+Supabase Auth and add that user's UUID to `public.admin_users` with the `owner`
+role using a trusted administrative connection. Never expose a service-role or
+secret key in this repository or in the browser.
 
 ## Local development
 

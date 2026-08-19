@@ -12,7 +12,7 @@ const runtimeFiles = [
   "style.css",
   "_headers",
 ];
-const runtimeDirectories = ["js", "product", "search", "shop"];
+const runtimeDirectories = ["admin", "js", "product", "search", "shop"];
 const assetDirectories = ["css", "fonts", "img", "vendor", "videos"];
 
 await rm(output, { recursive: true, force: true });

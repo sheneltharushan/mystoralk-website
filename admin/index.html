@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; base-uri 'self'; connect-src 'self' https://nphpncgggkwckfhyzlwt.supabase.co wss://nphpncgggkwckfhyzlwt.supabase.co; font-src 'self' data:; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: blob: https://nphpncgggkwckfhyzlwt.supabase.co; media-src 'self' blob:; object-src 'none'; script-src 'self'; style-src 'self'; upgrade-insecure-requests"
+    />
+    <title>Mystora Atelier — Administration</title>
+    <link rel="icon" href="/assets/img/logo.png" />
+    <link rel="stylesheet" href="/admin/admin.css" />
+    <script defer src="/assets/vendor/supabase.js"></script>
+    <script type="module" src="/admin/admin.js"></script>
+  </head>
+  <body>
+    <div class="admin-noise" aria-hidden="true"></div>
+
+    <main id="auth-screen" class="auth-screen">
+      <section class="auth-card" aria-labelledby="auth-title">
+        <div class="auth-brand" aria-hidden="true">MYSTORA</div>
+        <p class="eyebrow">Private atelier</p>
+        <h1 id="auth-title">Welcome back.</h1>
+        <p class="auth-intro">Manage the collection, storefront and customer enquiries.</p>
+
+        <form id="login-form" class="form-stack" novalidate>
+          <label>
+            <span>Email address</span>
+            <input id="login-email" name="email" type="email" autocomplete="username" required maxlength="254" />
+          </label>
+          <label>
+            <span>Password</span>
+            <input id="login-password" name="password" type="password" autocomplete="current-password" required minlength="8" maxlength="128" />
+          </label>
+          <button class="button button--primary" type="submit">Enter the atelier</button>
+        </form>
+
+        <button id="reset-password-button" class="text-button" type="button">Forgot your password?</button>
+        <p id="auth-status" class="form-status" role="status" aria-live="polite"></p>
+        <a class="auth-return" href="/">← Return to Mystora</a>
+      </section>
+    </main>
+
+    <div id="admin-app" class="admin-app" hidden>
+      <aside id="admin-sidebar" class="admin-sidebar">
+        <div>
+          <a class="admin-wordmark" href="/admin/" aria-label="Mystora administration">MYSTORA</a>
+          <p class="admin-sidebar__label">Private atelier</p>
+        </div>
+
+        <nav class="admin-nav" aria-label="Administration">
+          <button class="admin-nav__item is-active" type="button" data-view="dashboard">
+            <span>01</span> Dashboard
+          </button>
+          <button class="admin-nav__item" type="button" data-view="products">
+            <span>02</span> Products
+          </button>
+          <button class="admin-nav__item" type="button" data-view="collections">
+            <span>03</span> Collections
+          </button>
+          <button class="admin-nav__item" type="button" data-view="orders">
+            <span>04</span> Orders
+          </button>
+          <button class="admin-nav__item" type="button" data-view="media">
+            <span>05</span> Media
+          </button>
+          <button class="admin-nav__item" type="button" data-view="settings">
+            <span>06</span> Settings
+          </button>
+          <button class="admin-nav__item" type="button" data-view="activity">
+            <span>07</span> Activity
+          </button>
+        </nav>
+
+        <div class="admin-sidebar__footer">
+          <div class="staff-chip">
+            <span id="staff-initial" class="staff-chip__avatar">M</span>
+            <div>
+              <strong id="staff-name">Mystora staff</strong>
+              <small id="staff-role">Editor</small>
+            </div>
+          </div>
+          <button id="sign-out-button" class="text-button" type="button">Sign out</button>
+        </div>
+      </aside>
+
+      <div class="admin-workspace">
+        <header class="admin-topbar">
+          <button id="sidebar-toggle" class="icon-button admin-mobile-only" type="button" aria-label="Open navigation" aria-expanded="false">
+            <span></span><span></span>
+          </button>
+          <div>
+            <p id="view-eyebrow" class="eyebrow">Overview</p>
+            <h1 id="view-title">Dashboard</h1>
+          </div>
+          <div class="admin-topbar__actions">
+            <a class="button button--quiet" href="/" target="_blank" rel="noopener">View storefront ↗</a>
+            <button id="global-add-button" class="button button--primary" type="button">Add product</button>
+          </div>
+        </header>
+
+        <div id="global-status" class="global-status" role="status" aria-live="polite" hidden></div>
+
+        <section class="admin-view is-active" data-panel="dashboard" aria-labelledby="dashboard-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Today at a glance</p>
+              <h2 id="dashboard-heading">Quiet control, clear decisions.</h2>
+            </div>
+            <button class="button button--quiet" type="button" data-refresh="all">Refresh data</button>
+          </div>
+          <div id="dashboard-metrics" class="metric-grid" aria-live="polite"></div>
+          <div class="dashboard-grid">
+            <article class="panel">
+              <div class="panel__heading"><h3>Recent enquiries</h3><button class="text-button" type="button" data-go="orders">View all</button></div>
+              <div id="dashboard-orders" class="data-list"></div>
+            </article>
+            <article class="panel">
+              <div class="panel__heading"><h3>Collection health</h3><button class="text-button" type="button" data-go="collections">Curate</button></div>
+              <div id="dashboard-collections" class="data-list"></div>
+            </article>
+            <article class="panel panel--wide">
+              <div class="panel__heading"><h3>Recent activity</h3><button class="text-button" type="button" data-go="activity">Audit trail</button></div>
+              <div id="dashboard-activity" class="data-list"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="admin-view" data-panel="products" aria-labelledby="products-heading">
+          <div class="section-heading">
+            <div><p class="eyebrow">Catalogue</p><h2 id="products-heading">Products</h2></div>
+            <button class="button button--primary" type="button" data-action="add-product">Add product</button>
+          </div>
+          <div class="toolbar">
+            <label class="search-field"><span class="sr-only">Search products</span><input id="product-search" type="search" placeholder="Search by name or slug" maxlength="80" /></label>
+            <select id="product-category-filter" aria-label="Filter by category"><option value="">All categories</option></select>
+            <select id="product-status-filter" aria-label="Filter by status"><option value="">All statuses</option><option value="active">Active</option><option value="draft">Draft</option><option value="featured">Featured</option></select>
+          </div>
+          <div class="table-shell">
+            <table>
+              <thead><tr><th>Product</th><th>Category</th><th>Sizes</th><th>Internal stock</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead>
+              <tbody id="products-table-body"></tbody>
+            </table>
+          </div>
+          <p id="products-empty" class="empty-state" hidden>No products match these filters.</p>
+        </section>
+
+        <section class="admin-view" data-panel="collections" aria-labelledby="collections-heading">
+          <div class="section-heading">
+            <div><p class="eyebrow">Storefront curation</p><h2 id="collections-heading">Collections</h2></div>
+            <button class="button button--primary" type="button" data-action="add-collection">New collection</button>
+          </div>
+          <div id="collections-grid" class="collection-grid"></div>
+        </section>
+
+        <section class="admin-view" data-panel="orders" aria-labelledby="orders-heading">
+          <div class="section-heading">
+            <div><p class="eyebrow">WhatsApp enquiries</p><h2 id="orders-heading">Orders</h2></div>
+            <button class="button button--primary" type="button" data-action="add-order">Record order</button>
+          </div>
+          <div class="toolbar">
+            <label class="search-field"><span class="sr-only">Search orders</span><input id="order-search" type="search" placeholder="Customer, phone or product" maxlength="80" /></label>
+            <select id="order-status-filter" aria-label="Filter by order status"><option value="">All statuses</option><option value="new">New</option><option value="contacted">Contacted</option><option value="confirmed">Confirmed</option><option value="preparing">Preparing</option><option value="dispatched">Dispatched</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select>
+          </div>
+          <div class="table-shell">
+            <table>
+              <thead><tr><th>Reference</th><th>Customer</th><th>Item</th><th>Total</th><th>Status</th><th>Updated</th><th><span class="sr-only">Actions</span></th></tr></thead>
+              <tbody id="orders-table-body"></tbody>
+            </table>
+          </div>
+          <p id="orders-empty" class="empty-state" hidden>No orders have been recorded yet.</p>
+        </section>
+
+        <section class="admin-view" data-panel="media" aria-labelledby="media-heading">
+          <div class="section-heading">
+            <div><p class="eyebrow">Product imagery</p><h2 id="media-heading">Media library</h2></div>
+            <label class="button button--primary upload-button">Upload images<input id="media-upload" type="file" accept="image/jpeg,image/png,image/webp" multiple /></label>
+          </div>
+          <p class="section-note">JPEG, PNG or WebP. Maximum 8 MB per image. Files are stored in Mystora’s public product-media bucket.</p>
+          <div id="media-grid" class="media-grid"></div>
+          <p id="media-empty" class="empty-state" hidden>No uploaded media found.</p>
+        </section>
+
+        <section class="admin-view" data-panel="settings" aria-labelledby="settings-heading">
+          <div class="section-heading"><div><p class="eyebrow">Storefront configuration</p><h2 id="settings-heading">Settings</h2></div></div>
+          <form id="settings-form" class="settings-form">
+            <article class="panel">
+              <div class="panel__heading"><h3>Ordering</h3></div>
+              <label><span>WhatsApp number</span><input name="whatsapp_phone" inputmode="tel" maxlength="20" pattern="[0-9]+" /></label>
+              <label><span>Delivery note</span><input name="delivery_note" maxlength="160" /></label>
+              <label><span>Announcement</span><textarea name="announcement" maxlength="240" rows="3"></textarea></label>
+            </article>
+            <article class="panel">
+              <div class="panel__heading"><h3>Social profiles</h3></div>
+              <label><span>Facebook URL</span><input name="facebook_url" type="url" maxlength="500" /></label>
+              <label><span>Instagram URL</span><input name="instagram_url" type="url" maxlength="500" /></label>
+              <label><span>TikTok URL</span><input name="tiktok_url" type="url" maxlength="500" /></label>
+            </article>
+            <div class="settings-form__footer"><p id="settings-status" class="form-status" role="status"></p><button class="button button--primary" type="submit">Save settings</button></div>
+          </form>
+        </section>
+
+        <section class="admin-view" data-panel="activity" aria-labelledby="activity-heading">
+          <div class="section-heading">
+            <div><p class="eyebrow">Immutable history</p><h2 id="activity-heading">Activity</h2></div>
+            <button class="button button--quiet" type="button" data-refresh="activity">Refresh</button>
+          </div>
+          <div id="activity-list" class="activity-list"></div>
+        </section>
+      </div>
+    </div>
+
+    <dialog id="product-dialog" class="admin-dialog">
+      <form id="product-form" method="dialog">
+        <div class="dialog-heading"><div><p class="eyebrow">Catalogue editor</p><h2 id="product-dialog-title">Add product</h2></div><button class="icon-button" type="button" data-close-dialog aria-label="Close">×</button></div>
+        <input name="id" type="hidden" />
+        <div class="dialog-grid">
+          <label class="field-span-2"><span>Product name</span><input name="name" required maxlength="120" /></label>
+          <label><span>Slug</span><input name="slug" required maxlength="140" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" /></label>
+          <label><span>Category</span><input name="category" required maxlength="60" list="category-options" /></label>
+          <datalist id="category-options"><option value="clone"></option><option value="special"></option></datalist>
+          <label class="field-span-2"><span>Description</span><textarea name="description" rows="5" maxlength="2000"></textarea></label>
+          <fieldset class="field-span-2"><legend>Bottle sizes and prices</legend><div class="variant-grid">
+            <label><span>10 ml price</span><input name="price_10ml" type="number" min="0" step="1" /></label>
+            <label><span>50 ml price</span><input name="price_50ml" type="number" min="0" step="1" /></label>
+            <label><span>100 ml price</span><input name="price_100ml" type="number" min="0" step="1" /></label>
+          </div></fieldset>
+          <label><span>Primary image URL</span><input name="image_url" type="url" maxlength="1000" /></label>
+          <label><span>Hover image URL</span><input name="hover_image_url" type="url" maxlength="1000" /></label>
+          <label><span>10 ml image URL</span><input name="image_10ml" type="url" maxlength="1000" /></label>
+          <label><span>50 ml image URL</span><input name="image_50ml" type="url" maxlength="1000" /></label>
+          <label><span>100 ml image URL</span><input name="image_100ml" type="url" maxlength="1000" /></label>
+          <label><span>Promotional image URL</span><input name="promo_image" type="url" maxlength="1000" /></label>
+          <label><span>Internal stock</span><input name="stock" type="number" min="0" step="1" value="0" /></label>
+          <div class="toggle-group"><label class="toggle"><input name="active" type="checkbox" checked /><span></span>Published</label><label class="toggle"><input name="is_featured" type="checkbox" /><span></span>Featured</label></div>
+        </div>
+        <div class="dialog-footer"><p id="product-form-status" class="form-status" role="status"></p><div><button class="button button--quiet" type="button" data-close-dialog>Cancel</button><button class="button button--primary" type="submit">Save product</button></div></div>
+      </form>
+    </dialog>
+
+    <dialog id="collection-dialog" class="admin-dialog">
+      <form id="collection-form" method="dialog">
+        <div class="dialog-heading"><div><p class="eyebrow">Storefront curation</p><h2 id="collection-dialog-title">Edit collection</h2></div><button class="icon-button" type="button" data-close-dialog aria-label="Close">×</button></div>
+        <input name="id" type="hidden" />
+        <div class="dialog-grid">
+          <label><span>Name</span><input name="name" required maxlength="100" /></label>
+          <label><span>Slug</span><input name="slug" required maxlength="120" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" /></label>
+          <label class="field-span-2"><span>Description</span><textarea name="description" rows="3" maxlength="500"></textarea></label>
+          <label><span>Display order</span><input name="sort_order" type="number" min="0" step="1" value="0" /></label>
+          <label class="toggle"><input name="active" type="checkbox" checked /><span></span>Visible on storefront</label>
+          <fieldset class="field-span-2"><legend>Products in this collection</legend><div id="collection-product-picker" class="product-picker"></div></fieldset>
+        </div>
+        <div class="dialog-footer"><p id="collection-form-status" class="form-status" role="status"></p><div><button class="button button--quiet" type="button" data-close-dialog>Cancel</button><button class="button button--primary" type="submit">Save collection</button></div></div>
+      </form>
+    </dialog>
+
+    <dialog id="order-dialog" class="admin-dialog">
+      <form id="order-form" method="dialog">
+        <div class="dialog-heading"><div><p class="eyebrow">Customer enquiry</p><h2 id="order-dialog-title">Record order</h2></div><button class="icon-button" type="button" data-close-dialog aria-label="Close">×</button></div>
+        <input name="id" type="hidden" />
+        <div class="dialog-grid">
+          <label><span>Customer name</span><input name="customer_name" required maxlength="120" /></label>
+          <label><span>Phone</span><input name="phone" required maxlength="30" /></label>
+          <label><span>Email</span><input name="email" type="email" maxlength="254" /></label>
+          <label><span>Status</span><select name="status"><option value="new">New</option><option value="contacted">Contacted</option><option value="confirmed">Confirmed</option><option value="preparing">Preparing</option><option value="dispatched">Dispatched</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select></label>
+          <label><span>Product</span><select id="order-product" name="product_id"><option value="">Custom item</option></select></label>
+          <label><span>Size</span><select name="size"><option value="">Not specified</option><option value="10ml">10 ml</option><option value="50ml">50 ml</option><option value="100ml">100 ml</option></select></label>
+          <label class="field-span-2"><span>Item description</span><input name="items" required maxlength="300" /></label>
+          <label><span>Total (LKR)</span><input name="total" type="number" min="0" step="1" /></label>
+          <label><span>Source</span><select name="source"><option value="manual">Manual</option><option value="whatsapp">WhatsApp</option><option value="instagram">Instagram</option><option value="facebook">Facebook</option></select></label>
+          <label class="field-span-2"><span>Delivery address</span><textarea name="address" rows="2" maxlength="500"></textarea></label>
+          <label class="field-span-2"><span>Internal notes</span><textarea name="admin_notes" rows="3" maxlength="1000"></textarea></label>
+        </div>
+        <div class="dialog-footer"><p id="order-form-status" class="form-status" role="status"></p><div><button class="button button--quiet" type="button" data-close-dialog>Cancel</button><button class="button button--primary" type="submit">Save order</button></div></div>
+      </form>
+    </dialog>
+
+    <div id="confirm-overlay" class="confirm-overlay" hidden>
+      <section role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" class="confirm-card">
+        <p class="eyebrow">Please confirm</p><h2 id="confirm-title">Remove this item?</h2><p id="confirm-message"></p>
+        <div><button id="confirm-cancel" class="button button--quiet" type="button">Cancel</button><button id="confirm-accept" class="button button--danger" type="button">Remove</button></div>
+      </section>
+    </div>
+  </body>
+</html>

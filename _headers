@@ -18,3 +18,7 @@
 
 /navbar.partial
   Cache-Control: no-cache
+
+/admin/*
+  Cache-Control: no-store
+  X-Robots-Tag: noindex, nofollow, noarchive

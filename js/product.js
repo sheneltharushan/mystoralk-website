@@ -8,6 +8,7 @@ import {
 } from "./dom.js";
 import { createProductCard } from "./products.js";
 import { getSupabaseClient } from "./supabase.js";
+import { loadPublicSettings } from "./settings.js";
 
 const PRODUCT_FIELDS = [
   "id", "slug", "name", "category", "description", "price",
@@ -30,11 +31,19 @@ const CATEGORY_LABELS = {
 
 let currentProduct = null;
 let selectedSize = "50ml";
+let whatsappPhone = WHATSAPP_PHONE;
 
 export function initProductPage() {
   if (!document.getElementById("product-name")) return;
 
   setupGallerySwipe();
+  loadPublicSettings().then((settings) => {
+    const configuredPhone = String(settings.get("whatsapp_phone") || "").replace(/\D/g, "");
+    if (configuredPhone.length >= 8 && configuredPhone.length <= 20) {
+      whatsappPhone = configuredPhone;
+      updateWhatsAppLink();
+    }
+  });
   document.querySelectorAll(".size-btn").forEach((button) => {
     button.addEventListener("click", () => updateSize(button.dataset.size));
   });
@@ -326,7 +335,7 @@ function updateWhatsAppLink() {
       currentProduct.name + " (" + selectedSize + ") for " +
       formatLkr(price) + ".",
   );
-  button.href = "https://wa.me/" + WHATSAPP_PHONE + "?text=" + message;
+  button.href = "https://wa.me/" + whatsappPhone + "?text=" + message;
   setOrderButtonState(true);
 }
 

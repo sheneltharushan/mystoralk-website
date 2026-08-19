@@ -170,9 +170,20 @@ function initComingSoonPanel(container) {
   const secondary = container.querySelector("#comingSoonSecondary");
   if (!overlay || !triggers.length || !title || !description || !primary || !secondary) return;
 
-  const whatsappUrl =
-    "https://wa.me/94768253595?text=" +
-    encodeURIComponent("Hi Mystora, I would like some help placing an order.");
+  const getWhatsAppUrl = () => {
+    const configured = container.querySelector('[data-setting-href="whatsapp_url"]')?.href || "";
+    let phone = "94768253595";
+    try {
+      const url = new URL(configured);
+      phone = url.hostname === "wa.me"
+        ? url.pathname.replace(/\D/g, "") || phone
+        : url.searchParams.get("phone")?.replace(/\D/g, "") || phone;
+    } catch {
+      // The production fallback below remains available.
+    }
+    return "https://wa.me/" + phone + "?text=" +
+      encodeURIComponent("Hi Mystora, I would like some help placing an order.");
+  };
   const content = {
     profile: {
       number: "01",
@@ -181,7 +192,7 @@ function initComingSoonPanel(container) {
         "Personal accounts are being prepared for a quieter, more personal way to shop Mystora.",
       benefits: ["Save your favourites", "Keep delivery details ready", "See your order history"],
       primary: { label: "Explore fragrances", href: "/shop/" },
-      secondary: { label: "Talk to us", href: whatsappUrl, external: true },
+      secondary: { label: "Talk to us", href: "#whatsapp", external: true },
     },
     cart: {
       number: "02",
@@ -189,7 +200,7 @@ function initComingSoonPanel(container) {
       description:
         "Online checkout is not live yet. Until then, every order is handled personally through WhatsApp.",
       benefits: ["Choose your bottle size", "Confirm delivery directly", "Get help from a real person"],
-      primary: { label: "Order on WhatsApp", href: whatsappUrl, external: true },
+      primary: { label: "Order on WhatsApp", href: "#whatsapp", external: true },
       secondary: { label: "Browse fragrances", href: "/shop/" },
     },
   };
@@ -211,7 +222,7 @@ function initComingSoonPanel(container) {
       attributes: { "aria-hidden": "true" },
     });
     element.replaceChildren(document.createTextNode(action.label + " "), arrow);
-    element.href = action.href;
+    element.href = action.href === "#whatsapp" ? getWhatsAppUrl() : action.href;
     if (action.external) {
       element.target = "_blank";
       element.rel = "noopener";
