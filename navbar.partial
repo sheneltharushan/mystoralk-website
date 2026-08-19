@@ -1,0 +1,114 @@
+<header id="site-header" class="site-header">
+  <nav class="site-nav" aria-label="Primary navigation">
+    <div class="site-nav__left">
+      <button id="menuBtn" class="nav-icon-button nav-menu-button" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navDrawer">
+        <span class="hamburger-lines" aria-hidden="true"><i></i><i></i><i></i></span>
+      </button>
+      <div class="site-nav__links">
+        <a href="/">Home</a>
+        <a href="/shop/">Shop</a>
+      </div>
+    </div>
+
+    <a id="nav-brand" class="nav-brand" href="/" aria-label="Mystora home">
+      <img src="/assets/img/logo.png" alt="" aria-hidden="true" />
+    </a>
+
+    <div class="site-nav__actions">
+      <button id="searchBtn" class="nav-icon-button" type="button" aria-label="Search fragrances" aria-expanded="false" aria-controls="searchOverlay">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.75"></circle><path d="m16 16 4 4"></path></svg>
+      </button>
+      <button id="profileBtn" class="nav-icon-button" type="button" aria-label="Profile" aria-expanded="false" aria-controls="comingSoonOverlay" data-coming-soon="profile">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 20c.5-4 2.8-6 6.5-6s6 2 6.5 6"></path></svg>
+      </button>
+      <button id="cartBtn" class="nav-icon-button nav-cart-button" type="button" aria-label="Cart" aria-expanded="false" aria-controls="comingSoonOverlay" data-coming-soon="cart">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"></path><path d="M9 9V6a3 3 0 0 1 6 0v3"></path></svg>
+        <span class="nav-cart-dot" aria-hidden="true"></span>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<div id="navDrawer" class="nav-drawer" aria-hidden="true">
+  <button class="nav-drawer__backdrop" type="button" data-menu-close aria-label="Close menu"></button>
+  <aside class="nav-drawer__panel" aria-label="Navigation menu">
+    <div class="nav-drawer__head">
+      <span>Explore Mystora</span>
+      <button class="nav-icon-button" type="button" data-menu-close aria-label="Close menu">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+      </button>
+    </div>
+    <div class="nav-drawer__main-links">
+      <a href="/"><span>01</span>Home</a>
+      <a href="/shop/"><span>02</span>Shop all</a>
+    </div>
+    <div class="nav-drawer__collections">
+      <p>Collections</p>
+      <a href="/shop/?category=original">Mystora Originals</a>
+      <a href="/shop/?category=special">Special Collection</a>
+      <a href="/shop/?category=clone">Inspired Fragrances</a>
+    </div>
+    <div class="nav-drawer__footer">
+      <p>The secret in every drop.</p>
+      <div>
+        <a href="https://www.instagram.com/mystora.lk/">Instagram</a>
+        <a href="https://www.facebook.com/profile.php?id=61581027238674">Facebook</a>
+        <a href="https://api.whatsapp.com/send/?phone=94768253595&text">WhatsApp</a>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div id="comingSoonOverlay" class="coming-soon-overlay" aria-hidden="true">
+  <button class="coming-soon-overlay__backdrop" type="button" data-coming-close aria-label="Close preview"></button>
+  <section class="coming-soon-panel" role="dialog" aria-modal="true" aria-labelledby="comingSoonTitle" aria-describedby="comingSoonDescription">
+    <div class="coming-soon-panel__topline">
+      <span id="comingSoonEyebrow">Coming to Mystora</span>
+      <button class="nav-icon-button" type="button" data-coming-close aria-label="Close preview">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+      </button>
+    </div>
+    <p class="coming-soon-panel__number" aria-hidden="true">Soon / <span id="comingSoonNumber">01</span></p>
+    <h2 id="comingSoonTitle">Your Mystora profile</h2>
+    <p id="comingSoonDescription" class="coming-soon-panel__description"></p>
+    <div class="coming-soon-panel__benefits" aria-label="Planned features">
+      <p data-coming-benefit></p>
+      <p data-coming-benefit></p>
+      <p data-coming-benefit></p>
+    </div>
+    <div class="coming-soon-panel__actions">
+      <a id="comingSoonPrimary" class="coming-soon-panel__primary" href="/shop/">Browse fragrances <span aria-hidden="true">↗</span></a>
+      <a id="comingSoonSecondary" class="coming-soon-panel__secondary" href="/shop/">Continue shopping</a>
+    </div>
+  </section>
+</div>
+
+<div id="searchOverlay" class="search-overlay" aria-hidden="true">
+  <button class="search-overlay__backdrop" type="button" data-search-close aria-label="Close search"></button>
+  <section class="search-panel" role="dialog" aria-modal="true" aria-labelledby="search-title">
+    <div class="search-panel__topline">
+      <p id="search-title">Discover your signature</p>
+      <button class="nav-icon-button" type="button" data-search-close aria-label="Close search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+      </button>
+    </div>
+    <form id="globalSearchForm" class="premium-search" role="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.75"></circle><path d="m16 16 4 4"></path></svg>
+      <label class="sr-only" for="globalSearchInput">Search fragrances</label>
+      <input id="globalSearchInput" type="search" name="q" placeholder="Search by fragrance name" autocomplete="off" maxlength="80" />
+      <span>Press Enter</span>
+    </form>
+    <div class="search-panel__meta">
+      <p id="globalSearchStatus" role="status" aria-live="polite">Start typing to explore the collection.</p>
+      <a id="globalSearchAll" href="/shop/">View all fragrances</a>
+    </div>
+    <div class="search-quicklinks" aria-label="Popular searches">
+      <span>Popular</span>
+      <a href="/shop/?category=special">Special collection</a>
+      <a href="/shop/?category=clone">Inspired fragrances</a>
+      <a href="/shop/?featured=1">Featured</a>
+      <a href="/shop/?price=3000-7000">LKR 3,000–7,000</a>
+    </div>
+    <div id="globalSearchResults" class="search-results"></div>
+  </section>
+</div>

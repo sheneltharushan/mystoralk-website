@@ -3,189 +3,151 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mystora | Product Details</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; connect-src 'self' https://nphpncgggkwckfhyzlwt.supabase.co wss://nphpncgggkwckfhyzlwt.supabase.co; font-src 'self' data: https://fonts.gstatic.com; form-action 'self'; frame-src 'none'; img-src 'self' data: blob: https://nphpncgggkwckfhyzlwt.supabase.co; media-src 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; upgrade-insecure-requests" />
+    <meta name="description" content="Discover your Mystora fragrance, choose your preferred bottle size, and order directly from Mystora." />
+    <title>Fragrance Details | Mystora</title>
     <link rel="stylesheet" href="/style.css" />
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://unpkg.com/lenis@1.1.2/dist/lenis.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: { "mystora-black": "#050505", "mystora-gold": "#D4AF37" },
-            fontFamily: {
-              brand: ['"Playfair Display"', "serif"],
-              body: ['"Inter"', "sans-serif"],
-            },
-          },
-        },
-      };
-    </script>
+    <link rel="stylesheet" href="/assets/css/tailwind.css" />
     <link rel="icon" href="/assets/img/logo.png" />
+    <script src="/assets/vendor/lenis.min.js"></script>
+    <script src="/assets/vendor/supabase.js"></script>
   </head>
 
-  <body class="bg-mystora-black text-white antialiased font-body">
+  <body class="product-page-body">
     <div id="navbar-container"></div>
 
-    <main class="pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-        <!-- LEFT: keep your desktop layout, but disable sticky on mobile -->
-        <div
-          class="flex flex-col-reverse md:flex-row gap-6 lg:sticky lg:top-32"
-        >
-          <div
-            id="thumbnail-list"
-            class="flex md:flex-col gap-4 overflow-x-auto md:overflow-visible pb-4 md:pb-0"
-          ></div>
-
-          <div
-            class="flex-1 aspect-[3/4] bg-neutral-900 overflow-hidden border border-neutral-800"
-          >
-            <img
-              id="main-product-image"
-              src=""
-              alt="Product Image"
-              class="w-full h-full object-cover opacity-0 transition-opacity duration-500"
-            />
+    <main class="product-page" id="product-top">
+      <section class="product-hero" aria-labelledby="product-name">
+        <div class="product-gallery">
+          <div class="product-gallery__stage">
+            <img id="main-product-image" alt="" decoding="async" fetchpriority="high" />
+            <div class="product-gallery__veil" aria-hidden="true"></div>
+            <p class="product-gallery__index" aria-live="polite"><span id="gallery-current">01</span> / <span id="gallery-total">01</span></p>
           </div>
+          <div id="thumbnail-list" class="product-gallery__thumbs" aria-label="Product gallery"></div>
         </div>
 
-        <!-- RIGHT -->
-        <div class="flex flex-col">
-          <nav
-            class="flex text-[10px] uppercase tracking-widest text-gray-500 mb-8 gap-2"
-          >
-            <a href="index.html" class="hover:text-white">Home</a>
+        <div class="product-purchase">
+          <nav class="product-breadcrumbs" aria-label="Breadcrumb">
+            <a href="/shop/">Shop</a>
             <span>/</span>
-            <span id="breadcrumb-category">Category</span>
+            <span id="breadcrumb-category">Collection</span>
           </nav>
 
-          <h1
-            id="product-name"
-            class="text-4xl md:text-6xl font-brand mb-4 leading-tight"
-          >
-            Loading...
-          </h1>
+          <div class="product-purchase__meta">
+            <p id="product-collection">Mystora collection</p>
+          </div>
 
-          <p
-            id="inspired-by"
-            class="text-xs italic text-gray-400 mb-8 uppercase tracking-widest"
-          ></p>
+          <h1 id="product-name">Loading fragrance…</h1>
+          <p id="inspired-by" class="product-purchase__origin"></p>
+          <p id="product-intro" class="product-purchase__intro"></p>
 
-          <div class="mb-10 p-6 border border-neutral-800 bg-neutral-900/30">
-            <p
-              class="text-[10px] uppercase tracking-[0.3em] text-gray-500 mb-6"
-            >
-              Select Size
-            </p>
-
-            <div class="flex flex-wrap gap-3">
-              <button
-                type="button"
-                onclick="updateSize('10ml')"
-                class="size-btn border border-neutral-700 px-8 py-3 text-[10px] uppercase tracking-widest hover:border-white transition-all"
-              >
-                10ml
+          <div class="product-variants">
+            <div class="product-variants__head">
+              <p>Choose your size</p>
+            </div>
+            <div class="product-variants__options">
+              <button type="button" class="size-btn" data-size="10ml" aria-pressed="false">
+                <span>10 ml</span>
+                <small>Discover</small>
+                <strong data-size-price="10ml">—</strong>
               </button>
-
-              <button
-                type="button"
-                onclick="updateSize('50ml')"
-                class="size-btn border border-white bg-white text-black px-8 py-3 text-[10px] uppercase tracking-widest transition-all"
-              >
-                50ml
+              <button type="button" class="size-btn is-active" data-size="50ml" aria-pressed="true">
+                <span>50 ml</span>
+                <small>Signature</small>
+                <strong data-size-price="50ml">—</strong>
               </button>
-
-              <button
-                type="button"
-                onclick="updateSize('100ml')"
-                class="size-btn border border-neutral-700 px-8 py-3 text-[10px] uppercase tracking-widest hover:border-white transition-all"
-              >
-                100ml
+              <button type="button" class="size-btn" data-size="100ml" aria-pressed="false">
+                <span>100 ml</span>
+                <small>Full size</small>
+                <strong data-size-price="100ml">—</strong>
               </button>
             </div>
           </div>
 
-          <div class="mb-12">
-            <p
-              class="text-[10px] uppercase tracking-[0.3em] text-gray-500 mb-2"
-            >
-              Price
-            </p>
-            <p id="product-price" class="text-3xl font-brand text-white">
-              LKR 0.00
-            </p>
+          <div class="product-purchase__total">
+            <div>
+              <span>Selected price</span>
+              <p id="product-price">LKR —</p>
+            </div>
+            <p id="selected-size-label">50 ml · Signature</p>
           </div>
 
-          <a
-            id="whatsapp-order-btn"
-            href="#"
-            target="_blank"
-            rel="noopener"
-            class="block w-full bg-white text-black text-center py-5 uppercase text-[10px] tracking-[0.4em] font-bold hover:bg-neutral-200 transition-colors"
-          >
-            Order via WhatsApp
+          <a id="whatsapp-order-btn" class="product-order-button is-disabled" href="#" target="_blank" rel="noopener" aria-disabled="true">
+            <span>Order via WhatsApp</span>
+            <span aria-hidden="true">↗</span>
           </a>
 
-          <div class="mt-12 pt-12 border-t border-neutral-800">
-            <p
-              class="text-[10px] uppercase tracking-[0.3em] text-gray-500 mb-4"
-            >
-              Description
-            </p>
-            <p
-              id="product-description"
-              class="text-sm text-gray-400 leading-loose max-w-md font-light"
-            ></p>
+          <div class="product-assurances" aria-label="Ordering information">
+            <div><span>01</span><p>Islandwide delivery</p></div>
+            <div><span>02</span><p>Secure WhatsApp order</p></div>
+            <div><span>03</span><p>Human help, always</p></div>
           </div>
         </div>
-      </div>
-
-      <section class="mt-40 pt-20 border-t border-neutral-800">
-        <h2 class="text-3xl font-brand mb-12">Similar Fragrances</h2>
-        <div
-          id="similar-grid"
-          class="grid grid-cols-1 md:grid-cols-4 gap-8"
-        ></div>
       </section>
 
-      <footer
-        class="bg-mystora-black border-t border-gray-900 py-20 px-6 text-center"
-      >
-        <img
-          src="/assets/img/logo.png"
-          alt="Mystora"
-          class="w-16 mx-auto mb-8 invert opacity-50"
-        />
-        <p class="font-brand text-3xl text-white mb-8">MYSTORA</p>
-        <div
-          class="flex justify-center gap-8 text-gray-500 text-xs tracking-widest uppercase mb-12"
-        >
-          <a
-            href="https://www.instagram.com/mystora.lk/"
-            class="hover:text-white transition-colors"
-            >Instagram</a
-          >
-          <a
-            href="https://api.whatsapp.com/send/?phone=94768253595&text"
-            class="hover:text-white transition-colors"
-            >WhatsApp</a
-          >
-          <a
-            href="https://www.tiktok.com/@mystora.lk"
-            class="hover:text-white transition-colors"
-            >TikTok</a
-          >
+      <section class="product-story" aria-labelledby="product-story-heading">
+        <div class="product-story__heading">
+          <p>Inside the fragrance</p>
+          <h2 id="product-story-heading">The scent,<br /><em>unfolded.</em></h2>
         </div>
-        <p class="text-gray-800 text-[10px] uppercase tracking-widest">
-          &copy; 2026 Mystora Perfumes. Sri Lanka.
-        </p>
-      </footer>
+        <div class="product-story__copy">
+          <p id="product-description"></p>
+          <a id="product-collection-link" href="/shop/">Explore the collection <span aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+
+      <section class="product-related" aria-labelledby="similar-heading">
+        <div class="product-related__head">
+          <div>
+            <p>Continue exploring</p>
+            <h2 id="similar-heading">Similar fragrances</h2>
+          </div>
+          <a href="/shop/">View all fragrances</a>
+        </div>
+        <div id="similar-grid" class="product-related__grid"></div>
+      </section>
     </main>
 
-    <script src="/script.js"></script>
+    <footer class="site-footer" id="site-footer">
+      <p class="site-footer__wordmark" aria-label="Mystora dot L K">MYSTORA.LK</p>
+
+      <div class="site-footer__grid">
+        <div class="site-footer__newsletter">
+          <p class="home-eyebrow">Private notes from Mystora</p>
+          <h2>New drops, quietly delivered.</h2>
+          <form class="footer-signup" id="footer-signup">
+            <label class="sr-only" for="footer-email">Email address</label>
+            <input id="footer-email" name="email" type="email" autocomplete="email" placeholder="Email address" required />
+            <button type="submit">Join the list &#8594;</button>
+          </form>
+          <p class="footer-signup__status" id="footer-signup-status" role="status"></p>
+        </div>
+
+        <nav class="site-footer__links" aria-label="Shop links">
+          <p>Shop</p>
+          <a href="/shop/">All fragrances</a>
+          <a href="/shop/?q=for%20him">For him</a>
+          <a href="/shop/?q=for%20her">For her</a>
+          <a href="/shop/?category=special">Special Collection</a>
+        </nav>
+
+        <nav class="site-footer__links" aria-label="Help links">
+          <p>Help & contact</p>
+          <a href="https://api.whatsapp.com/send/?phone=94768253595&text=Hi%20Mystora%2C%20I%20need%20some%20help">WhatsApp us</a>
+          <a href="https://www.instagram.com/mystora.lk/">Instagram</a>
+          <a href="https://www.facebook.com/profile.php?id=61581027238674">Facebook</a>
+          <a href="https://www.tiktok.com/@mystora.lk">TikTok</a>
+        </nav>
+      </div>
+
+      <div class="site-footer__bottom">
+        <p>&copy; 2026 Mystora Perfumes. Sri Lanka.</p>
+        <p>The secret in every drop.</p>
+        <a href="#product-top">Back to top &#8593;</a>
+      </div>
+    </footer>
+
+    <script type="module" src="/js/main.js"></script>
   </body>
 </html>

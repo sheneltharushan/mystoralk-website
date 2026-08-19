@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; connect-src 'self' https://nphpncgggkwckfhyzlwt.supabase.co wss://nphpncgggkwckfhyzlwt.supabase.co; font-src 'self' data: https://fonts.gstatic.com; form-action 'self'; frame-src 'none'; img-src 'self' data: blob: https://nphpncgggkwckfhyzlwt.supabase.co; media-src 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; upgrade-insecure-requests" />
+    <meta name="description" content="Search and filter the complete Mystora fragrance collection." />
+    <title>Search Fragrances | Mystora</title>
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/assets/css/tailwind.css" />
+    <link rel="icon" href="/assets/img/logo.png" />
+    <script src="/assets/vendor/supabase.js"></script>
+  </head>
+
+  <body class="search-page-body">
+    <div id="navbar-container"></div>
+
+    <main class="search-page">
+      <header class="search-page__hero">
+        <div class="search-page__eyebrow">
+          <span>Collection search</span>
+          <span id="search-query-summary">All fragrances</span>
+        </div>
+        <h1>Find your<br /><em>signature.</em></h1>
+        <form id="search-page-form" class="search-page__form" role="search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.75"></circle><path d="m16 16 4 4"></path></svg>
+          <label class="sr-only" for="search-page-input">Search the Mystora collection</label>
+          <input id="search-page-input" type="search" name="q" autocomplete="off" maxlength="80" placeholder="Fragrance, collection, or inspiration" />
+          <button type="submit">Search</button>
+        </form>
+        <div id="search-suggestions" class="search-page__suggestions" aria-label="Suggested searches">
+          <span>Try</span>
+          <button type="button" data-query="Sauvage">Sauvage</button>
+          <button type="button" data-query="Vanille">Vanille</button>
+          <button type="button" data-query="For Her">For Her</button>
+        </div>
+      </header>
+
+      <section class="search-page__workspace" aria-labelledby="results-heading">
+        <div class="search-mobile-toolbar">
+          <button id="search-filter-toggle" type="button" aria-expanded="false" aria-controls="search-filters">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"></path></svg>
+            Filters <span id="search-filter-count">0</span>
+          </button>
+        </div>
+
+        <aside id="search-filters" class="search-filters" aria-label="Product filters">
+          <div class="search-filters__head">
+            <div>
+              <span>Refine</span>
+              <h2>Filter results</h2>
+            </div>
+            <button id="search-filter-close" class="search-filters__close" type="button" aria-label="Close filters">&times;</button>
+          </div>
+
+          <fieldset class="search-filter-group">
+            <legend>Collection</legend>
+            <label><input type="checkbox" name="category" value="special" /><span>Special collection</span><small data-category-count="special">0</small></label>
+            <label><input type="checkbox" name="category" value="clone" /><span>Inspired fragrances</span><small data-category-count="clone">0</small></label>
+            <label><input type="checkbox" name="category" value="original" /><span>Mystora originals</span><small data-category-count="original">0</small></label>
+          </fieldset>
+
+          <fieldset class="search-filter-group">
+            <legend>Bottle size</legend>
+            <label><input type="checkbox" name="size" value="10ml" /><span>10 ml</span></label>
+            <label><input type="checkbox" name="size" value="50ml" /><span>50 ml</span></label>
+            <label><input type="checkbox" name="size" value="100ml" /><span>100 ml</span></label>
+          </fieldset>
+
+          <fieldset class="search-filter-group">
+            <legend>Price</legend>
+            <label><input type="radio" name="price" value="any" checked /><span>Any price</span></label>
+            <label><input type="radio" name="price" value="under-3000" /><span>Under LKR 3,000</span></label>
+            <label><input type="radio" name="price" value="3000-7000" /><span>LKR 3,000–7,000</span></label>
+            <label><input type="radio" name="price" value="7000-10000" /><span>LKR 7,000–10,000</span></label>
+            <label><input type="radio" name="price" value="over-10000" /><span>Over LKR 10,000</span></label>
+          </fieldset>
+
+          <fieldset class="search-filter-group search-filter-group--compact">
+            <legend>Availability</legend>
+            <label><input type="checkbox" name="availability" value="in-stock" /><span>In stock only</span></label>
+            <label><input type="checkbox" name="featured" value="1" /><span>Featured only</span></label>
+          </fieldset>
+
+          <button id="search-clear-filters" class="search-filters__clear" type="button">Clear all filters</button>
+        </aside>
+
+        <div id="search-filter-backdrop" class="search-filters__backdrop" aria-hidden="true"></div>
+
+        <div class="search-results-page">
+          <div class="search-results-page__head">
+            <div>
+              <p id="search-results-count" role="status" aria-live="polite">Loading the collection…</p>
+              <h2 id="results-heading">Search results</h2>
+            </div>
+            <label class="search-sort">
+              <span>Sort by</span>
+              <select id="search-sort">
+                <option value="relevance">Relevance</option>
+                <option value="newest">Newest</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="name-asc">Name: A to Z</option>
+              </select>
+            </label>
+          </div>
+
+          <div id="search-active-filters" class="search-active-filters" aria-label="Active filters"></div>
+          <div id="search-page-grid" class="search-page-grid"></div>
+          <div id="search-page-empty" class="search-page-empty" hidden>
+            <span>0</span>
+            <h3>No fragrances found</h3>
+            <p>Try a broader search or remove one of your filters.</p>
+            <button type="button" data-clear-search>Clear search</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="search-page-footer">
+      <img src="/assets/img/logo.png" alt="" aria-hidden="true" />
+      <p>MYSTORA</p>
+      <span>The secret in every drop.</span>
+    </footer>
+
+    <script type="module" src="/js/main.js"></script>
+  </body>
+</html>

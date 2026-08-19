@@ -3,260 +3,161 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mystora | Shop</title>
-
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; connect-src 'self' https://nphpncgggkwckfhyzlwt.supabase.co wss://nphpncgggkwckfhyzlwt.supabase.co; font-src 'self' data: https://fonts.gstatic.com; form-action 'self'; frame-src 'none'; img-src 'self' data: blob: https://nphpncgggkwckfhyzlwt.supabase.co; media-src 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; upgrade-insecure-requests" />
+    <meta name="description" content="Shop and filter the complete Mystora fragrance collection, from discovery decants to signature bottles." />
+    <title>Shop Fragrances | Mystora</title>
     <link rel="stylesheet" href="/style.css" />
-
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-
-    <script src="https://unpkg.com/lenis@1.1.2/dist/lenis.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: { "mystora-black": "#050505", "mystora-gold": "#D4AF37" },
-            fontFamily: {
-              brand: ['"Playfair Display"', "serif"],
-              body: ['"Inter"', "sans-serif"],
-            },
-          },
-        },
-      };
-    </script>
+    <link rel="stylesheet" href="/assets/css/tailwind.css" />
     <link rel="icon" href="/assets/img/logo.png" />
+    <script src="/assets/vendor/supabase.js"></script>
   </head>
 
-  <body class="bg-mystora-black text-white antialiased font-body">
+  <body class="search-page-body shop-page-body" data-catalog-page="shop">
     <div id="navbar-container"></div>
 
-    <section class="relative w-full overflow-hidden">
-      <div
-        class="relative h-[280px] md:h-[420px] w-full bg-center bg-cover"
-        style="background-image: url(&quot;/assets/img/banner.png&quot;)"
-      >
-        <!-- overlays -->
-        <div class="absolute inset-0 bg-black/45"></div>
-        <div
-          class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-black/10"
-        ></div>
-
-        <!-- content container (keeps text aligned with your page) -->
-        <div
-          class="relative h-full max-w-7xl mx-auto px-6 md:px-12 flex items-center"
-        >
-          <div class="max-w-2xl">
-            <p
-              class="text-[10px] uppercase tracking-[0.35em] text-white/70 mb-3"
-            >
-              Shop
-            </p>
-
-            <h1
-              class="text-4xl md:text-6xl font-gotham-light tracking-[0.05em] uppercase leading-tight"
-            >
-              All Fragrances
-            </h1>
-
-            <p
-              class="mt-4 text-sm md:text-base text-white/70 leading-relaxed font-gotham-extralight"
-            >
-              Search, filter, and sort the full collection.
-            </p>
-          </div>
+    <main class="search-page">
+      <header class="search-page__hero shop-page__hero" id="shop-top">
+        <div class="search-page__eyebrow">
+          <span>The fragrance wardrobe</span>
+          <span id="search-query-summary">All fragrances</span>
         </div>
-      </div>
-    </section>
+        <h1>Find your<br /><em>signature.</em></h1>
+        <form id="search-page-form" class="search-page__form" role="search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.75"></circle><path d="m16 16 4 4"></path></svg>
+          <label class="sr-only" for="search-page-input">Search the Mystora shop</label>
+          <input id="search-page-input" type="search" name="q" autocomplete="off" maxlength="80" placeholder="Search the collection" />
+          <button type="submit">Search shop</button>
+        </form>
+        <nav class="search-page__suggestions shop-page__shortcuts" aria-label="Shop by collection">
+          <span>Browse</span>
+          <a href="/shop/">All</a>
+          <a href="/shop/?category=special">Special collection</a>
+          <a href="/shop/?category=clone">Inspired fragrances</a>
+          <a href="/shop/?size=10ml">10 ml decants</a>
+          <a href="/shop/?featured=1">Featured</a>
+        </nav>
+      </header>
 
-    <main class="pt-8 pb-20 px-6 md:px-12 max-w-7xl mx-auto">
-      <!-- Controls (modern, minimal) -->
-      <section class="mb-10">
-        <div
-          class="border border-neutral-800 bg-neutral-900/30 backdrop-blur-md p-4 md:p-5"
-        >
-          <div
-            class="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 items-end"
-          >
-            <!-- Search -->
-            <div class="md:col-span-6">
-              <label
-                class="block text-[10px] uppercase tracking-[0.32em] text-gray-500 mb-2"
-              >
-                Search
-              </label>
-              <div class="relative">
-                <!-- icon -->
-                <svg
-                  class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <circle cx="11" cy="11" r="7"></circle>
-                  <path d="M21 21l-4.3-4.3"></path>
-                </svg>
-
-                <input
-                  id="shop-search"
-                  type="text"
-                  placeholder="Search fragrances"
-                  class="w-full bg-transparent border border-neutral-800 pl-11 pr-4 py-3 text-sm outline-none focus:border-white transition-colors placeholder:text-gray-600"
-                />
-              </div>
-            </div>
-
-            <!-- Category -->
-            <div class="md:col-span-3">
-              <label
-                class="block text-[10px] uppercase tracking-[0.32em] text-gray-500 mb-2"
-              >
-                Category
-              </label>
-
-              <div class="relative">
-                <select
-                  id="shop-category"
-                  class="w-full appearance-none bg-mystora-black border border-neutral-800 px-4 py-3 text-sm outline-none focus:border-white transition-colors"
-                >
-                  <option value="all">All</option>
-                  <option value="clone">Clone</option>
-                  <option value="special">Special</option>
-                  <option value="original">Original</option>
-                </select>
-
-                <!-- chevron -->
-                <svg
-                  class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M6 9l6 6 6-6"></path>
-                </svg>
-              </div>
-            </div>
-
-            <!-- Sort -->
-            <div class="md:col-span-3">
-              <label
-                class="block text-[10px] uppercase tracking-[0.32em] text-gray-500 mb-2"
-              >
-                Sort
-              </label>
-
-              <div class="relative">
-                <select
-                  id="shop-sort"
-                  class="w-full appearance-none bg-mystora-black border border-neutral-800 px-4 py-3 text-sm outline-none focus:border-white transition-colors"
-                >
-                  <option value="newest">Newest</option>
-                  <option value="price_asc">Price: Low to High</option>
-                  <option value="price_desc">Price: High to Low</option>
-                  <option value="name_asc">Name: A to Z</option>
-                  <option value="name_desc">Name: Z to A</option>
-                </select>
-
-                <svg
-                  class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M6 9l6 6 6-6"></path>
-                </svg>
-              </div>
-            </div>
-
-            <!-- Bottom row -->
-            <div class="md:col-span-12 flex items-center justify-between pt-2">
-              <span
-                id="shop-results"
-                class="text-[10px] uppercase tracking-[0.32em] text-gray-500"
-              >
-                0 Results
-              </span>
-
-              <button
-                id="shop-clear"
-                type="button"
-                class="inline-flex items-center gap-2 border border-neutral-800 px-5 py-3 text-[10px] uppercase tracking-[0.25em] hover:border-white transition-all"
-              >
-                <!-- x icon -->
-                <svg
-                  class="w-4 h-4 text-gray-500"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M18 6L6 18"></path>
-                  <path d="M6 6l12 12"></path>
-                </svg>
-                Clear
-              </button>
-            </div>
-          </div>
+      <section class="search-page__workspace" aria-labelledby="results-heading">
+        <div class="search-mobile-toolbar">
+          <button id="search-filter-toggle" type="button" aria-expanded="false" aria-controls="search-filters">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"></path></svg>
+            Filters <span id="search-filter-count">0</span>
+          </button>
         </div>
-      </section>
 
-      <!-- Grid -->
-      <section>
-        <div
-          id="shop-grid"
-          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8"
-        ></div>
+        <aside id="search-filters" class="search-filters" aria-label="Product filters">
+          <div class="search-filters__head">
+            <div>
+              <span>Refine</span>
+              <h2>Shop by</h2>
+            </div>
+            <button id="search-filter-close" class="search-filters__close" type="button" aria-label="Close filters">&times;</button>
+          </div>
 
-        <div
-          id="shop-empty"
-          class="hidden mt-14 border border-neutral-800 bg-neutral-900/30 p-10 text-center"
-        >
-          <p class="text-sm text-gray-400">
-            No products found. Try a different search or filter.
-          </p>
+          <fieldset class="search-filter-group">
+            <legend>Collection</legend>
+            <label><input type="checkbox" name="category" value="special" /><span>Special collection</span><small data-category-count="special">0</small></label>
+            <label><input type="checkbox" name="category" value="clone" /><span>Inspired fragrances</span><small data-category-count="clone">0</small></label>
+            <label><input type="checkbox" name="category" value="original" /><span>Mystora originals</span><small data-category-count="original">0</small></label>
+          </fieldset>
+
+          <fieldset class="search-filter-group">
+            <legend>Bottle size</legend>
+            <label><input type="checkbox" name="size" value="10ml" /><span>10 ml discovery</span></label>
+            <label><input type="checkbox" name="size" value="50ml" /><span>50 ml signature</span></label>
+            <label><input type="checkbox" name="size" value="100ml" /><span>100 ml full size</span></label>
+          </fieldset>
+
+          <fieldset class="search-filter-group">
+            <legend>Price</legend>
+            <label><input type="radio" name="price" value="any" checked /><span>Any price</span></label>
+            <label><input type="radio" name="price" value="under-3000" /><span>Under LKR 3,000</span></label>
+            <label><input type="radio" name="price" value="3000-7000" /><span>LKR 3,000–7,000</span></label>
+            <label><input type="radio" name="price" value="7000-10000" /><span>LKR 7,000–10,000</span></label>
+            <label><input type="radio" name="price" value="over-10000" /><span>Over LKR 10,000</span></label>
+          </fieldset>
+
+          <fieldset class="search-filter-group search-filter-group--compact">
+            <legend>Availability</legend>
+            <label><input type="checkbox" name="availability" value="in-stock" /><span>In stock only</span></label>
+            <label><input type="checkbox" name="featured" value="1" /><span>Featured selection</span></label>
+          </fieldset>
+
+          <button id="search-clear-filters" class="search-filters__clear" type="button">Clear all filters</button>
+        </aside>
+
+        <div id="search-filter-backdrop" class="search-filters__backdrop" aria-hidden="true"></div>
+
+        <div class="search-results-page">
+          <div class="search-results-page__head">
+            <div>
+              <p id="search-results-count" role="status" aria-live="polite">Loading the collection…</p>
+              <h2 id="results-heading">All fragrances</h2>
+            </div>
+            <label class="search-sort">
+              <span>Sort by</span>
+              <select id="search-sort">
+                <option value="newest">Newest</option>
+                <option value="relevance">Recommended</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="name-asc">Name: A to Z</option>
+              </select>
+            </label>
+          </div>
+
+          <div id="search-active-filters" class="search-active-filters" aria-label="Active filters"></div>
+          <div id="search-page-grid" class="search-page-grid"></div>
+          <div id="search-page-empty" class="search-page-empty" hidden>
+            <span>0</span>
+            <h3>No fragrances found</h3>
+            <p>Try a broader search or remove one of your filters.</p>
+            <button type="button" data-clear-search>Reset the shop</button>
+          </div>
         </div>
       </section>
     </main>
 
-    <footer
-      class="bg-mystora-black border-t border-gray-900 py-20 px-6 text-center"
-    >
-      <img
-        src="/assets/img/logo.png"
-        alt="Mystora"
-        class="w-16 mx-auto mb-8 invert opacity-50"
-      />
-      <p class="font-brand text-3xl text-white mb-8">MYSTORA</p>
-      <div
-        class="flex justify-center gap-8 text-gray-500 text-xs tracking-widest uppercase mb-12"
-      >
-        <a
-          href="https://www.instagram.com/mystora.lk/"
-          class="hover:text-white transition-colors"
-          >Instagram</a
-        >
-        <a
-          href="https://api.whatsapp.com/send/?phone=94768253595&text"
-          class="hover:text-white transition-colors"
-          >WhatsApp</a
-        >
-        <a
-          href="https://www.tiktok.com/@mystora.lk"
-          class="hover:text-white transition-colors"
-          >TikTok</a
-        >
+    <footer class="site-footer" id="site-footer">
+      <p class="site-footer__wordmark" aria-label="Mystora dot L K">MYSTORA.LK</p>
+
+      <div class="site-footer__grid">
+        <div class="site-footer__newsletter">
+          <p class="home-eyebrow">Private notes from Mystora</p>
+          <h2>New drops, quietly delivered.</h2>
+          <form class="footer-signup" id="footer-signup">
+            <label class="sr-only" for="footer-email">Email address</label>
+            <input id="footer-email" name="email" type="email" autocomplete="email" placeholder="Email address" required />
+            <button type="submit">Join the list &#8594;</button>
+          </form>
+          <p class="footer-signup__status" id="footer-signup-status" role="status"></p>
+        </div>
+
+        <nav class="site-footer__links" aria-label="Shop links">
+          <p>Shop</p>
+          <a href="/shop/">All fragrances</a>
+          <a href="/shop/?q=for%20him">For him</a>
+          <a href="/shop/?q=for%20her">For her</a>
+          <a href="/shop/?category=special">Special Collection</a>
+        </nav>
+
+        <nav class="site-footer__links" aria-label="Help links">
+          <p>Help & contact</p>
+          <a href="https://api.whatsapp.com/send/?phone=94768253595&text=Hi%20Mystora%2C%20I%20need%20some%20help">WhatsApp us</a>
+          <a href="https://www.instagram.com/mystora.lk/">Instagram</a>
+          <a href="https://www.facebook.com/profile.php?id=61581027238674">Facebook</a>
+          <a href="https://www.tiktok.com/@mystora.lk">TikTok</a>
+        </nav>
       </div>
-      <p class="text-gray-800 text-[10px] uppercase tracking-widest">
-        &copy; 2026 Mystora Perfumes. Sri Lanka.
-      </p>
+
+      <div class="site-footer__bottom">
+        <p>&copy; 2026 Mystora Perfumes. Sri Lanka.</p>
+        <p>The secret in every drop.</p>
+        <a href="#shop-top">Back to top &#8593;</a>
+      </div>
     </footer>
 
-    <script src="/script.js"></script>
+    <script type="module" src="/js/main.js"></script>
   </body>
 </html>

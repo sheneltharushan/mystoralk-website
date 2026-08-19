@@ -1,0 +1,9 @@
+node_modules/
+playwright-report/
+test-results/
+dist/
+debug.log
+.mcp.json
+.env
+.env.*
+!.env.example

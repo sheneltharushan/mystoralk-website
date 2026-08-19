@@ -3,330 +3,216 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; connect-src 'self' https://nphpncgggkwckfhyzlwt.supabase.co wss://nphpncgggkwckfhyzlwt.supabase.co; font-src 'self' data: https://fonts.gstatic.com; form-action 'self'; frame-src 'none'; img-src 'self' data: blob: https://nphpncgggkwckfhyzlwt.supabase.co; media-src 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; upgrade-insecure-requests" />
     <title>Mystora | The Secret in Every Drop</title>
 
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="/assets/css/tailwind.css" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://unpkg.com/lenis@1.1.2/dist/lenis.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: { "mystora-black": "#050505", "mystora-gold": "#D4AF37" },
-            fontFamily: {
-              brand: ['"Playfair Display"', "serif"],
-              body: ['"Inter"', "sans-serif"],
-            },
-          },
-        },
-      };
-    </script>
-
+    <script src="/assets/vendor/gsap.min.js"></script>
+    <script src="/assets/vendor/ScrollTrigger.min.js"></script>
+    <script src="/assets/vendor/lenis.min.js"></script>
+    <script src="/assets/vendor/supabase.js"></script>
     <link rel="icon" href="/assets/img/logo.png" />
   </head>
   <body class="bg-mystora-black text-white antialiased overflow-x-hidden">
-    <nav>
-      <div id="navbar-container"></div>
-    </nav>
+    <div id="navbar-container"></div>
 
     <section
       id="hero-section"
-      class="relative h-screen bg-mystora-black overflow-hidden"
+      class="mystora-hero"
+      aria-labelledby="hero-wordmark"
     >
-      <div
-        id="scroll-indicator"
-        class="absolute bottom-14 md:bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 pointer-events-none mix-blend-difference text-white/90"
+      <video
+        id="hero-video"
+        class="mystora-hero__video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        poster="/assets/videos/hero_video_poster.webp"
+        aria-hidden="true"
       >
-        <span class="text-[10px] tracking-[0.35em] uppercase">Scroll</span>
-        <div
-          class="w-5 h-5 rotate-45 border-r border-b border-white/90 animate-bounce"
-        ></div>
-      </div>
-      <div class="w-full h-full relative">
-        <!-- WebP sequence canvas -->
-        <canvas
-          id="hero-canvas"
-          class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full object-cover z-0 opacity-0"
-        ></canvas>
+        <source src="/assets/videos/hero_video.mp4" type="video/mp4" />
+      </video>
 
-        <div
-          id="hero-text-container"
-          class="absolute inset-0 flex flex-col justify-center items-center text-center z-10 pointer-events-none mix-blend-difference text-white"
-        >
-          <h1 class="text-6xl md:text-9xl font-brand mb-4">MYSTORA</h1>
-          <p class="text-xs md:text-sm tracking-[0.5em] uppercase">
-            The Secret in Every Drop
-          </p>
-        </div>
+      <div class="mystora-hero__veil" aria-hidden="true"></div>
+
+      <div class="mystora-hero__content">
+        <h1 id="hero-wordmark" class="mystora-hero__wordmark">MYSTORA</h1>
+        <p id="hero-tagline" class="mystora-hero__tagline">
+          The secret in every drop
+        </p>
+      </div>
+
+      <div class="mystora-hero__scroll" aria-hidden="true">
+        <span>Scroll to discover</span>
+        <i></i>
       </div>
     </section>
 
-    <section
-      id="featured"
-      class="relative z-20 py-24 px-6 md:px-12 bg-mystora-black"
-    >
-      <div class="max-w-7xl mx-auto">
-        <div
-          class="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 gap-4 text-center md:text-left"
-        >
-          <div class="w-full md:w-auto">
-            <span
-              class="text-xs font-bold tracking-[0.3em] uppercase text-gray-500 mb-2 block"
-            >
-              Our Favorites
-            </span>
-            <h2
-              class="text-3xl md:text-5xl text-white font-gotham-light tracking-[0.06em]"
-            >
-              Featured Selection
-            </h2>
+    <main class="home-main">
+      <section id="featured" class="home-section featured-selection" aria-labelledby="featured-title">
+        <div class="home-section__head">
+          <div>
+            <p class="home-eyebrow">Featured selection / 01</p>
+            <h2 id="featured-title">New arrivals</h2>
           </div>
+          <div class="home-section__actions">
+            <a class="home-text-link" href="/shop/">Shop all fragrances</a>
+            <div class="rail-controls" aria-label="New arrivals carousel controls">
+              <button type="button" data-rail-prev aria-label="Previous products">&#8592;</button>
+              <button type="button" data-rail-next aria-label="Next products">&#8594;</button>
+            </div>
+          </div>
+        </div>
 
-          <a
-            href="shop.html"
-            class="w-full md:w-auto text-xs uppercase tracking-widest border-b border-white pb-1 hover:text-gray-400 hover:border-gray-400 transition-all inline-block md:inline"
-          >
-            View Full Catalog
+        <div class="product-rail" id="featured-rail" data-product-rail aria-live="polite"></div>
+        <div class="rail-progress" aria-hidden="true"><span data-rail-progress></span></div>
+      </section>
+
+      <section class="home-manifesto" aria-label="The Mystora philosophy">
+        <p class="home-eyebrow">Made to be remembered</p>
+        <p class="home-manifesto__line">A fragrance should enter quietly</p>
+        <p class="home-manifesto__line home-manifesto__line--accent">and stay after you leave.</p>
+      </section>
+
+      <section id="special" class="home-section special-collection" aria-labelledby="special-title">
+        <div class="home-section__head special-collection__head">
+          <div>
+            <p class="home-eyebrow">Original blends / 02</p>
+            <h2 id="special-title">The Special Collection</h2>
+          </div>
+          <p class="home-section__intro">
+            Our own signatures, built from the first note to the last. Two sides of one collection: for him and for her.
+          </p>
+        </div>
+
+        <div class="special-story-grid">
+          <article class="special-story-card special-story-card--video">
+            <video autoplay muted loop playsinline preload="none" poster="/assets/videos/hero_video_poster.webp" aria-label="Mystora Special Collection campaign film">
+              <source src="/assets/videos/hero_video.mp4" type="video/mp4" />
+            </video>
+            <div class="special-story-card__shade"></div>
+            <div class="special-story-card__copy">
+              <h3>Made for your story</h3>
+            </div>
+          </article>
+
+          <a class="special-story-card special-story-card--image" href="/shop/?category=special" aria-label="Shop the Special Collection">
+            <img src="/assets/img/banner.png" alt="Mystora fragrance bottles from the Special Collection" loading="lazy" />
+            <div class="special-story-card__shade"></div>
+            <div class="special-story-card__copy">
+              <span>Exclusive to Mystora</span>
+              <h3>Find your signature</h3>
+              <span class="special-story-card__link">Shop the collection <b>&#8599;</b></span>
+            </div>
           </a>
         </div>
+      </section>
 
-        <div
-          id="featured-grid"
-          class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-x-6 md:gap-y-12"
-        ></div>
-      </div>
-    </section>
-    <!-- Hashtag Carousel Strip -->
-    <section class="bg-mystora-black py-10">
-      <div class="border-y border-neutral-800 overflow-hidden">
-        <div class="hashtag-marquee">
-          <div class="hashtag-track">
-            <span class="hashtag-item">#MYSTORA</span>
-            <span class="hashtag-item">#MYSTORA</span>
-            <span class="hashtag-item">#MYSTORA</span>
-            <span class="hashtag-item">#MYSTORA</span>
-            <span class="hashtag-item">#MYSTORA</span>
-            <span class="hashtag-item">#MYSTORA</span>
-
-            <!-- duplicate set for seamless loop -->
-            <span class="hashtag-item">#MYSTORA</span>
-            <span class="hashtag-item">#MYSTORA</span>
-            <span class="hashtag-item">#MYSTORA</span>
-            <span class="hashtag-item">#MYSTORA</span>
-            <span class="hashtag-item">#MYSTORA</span>
-            <span class="hashtag-item">#MYSTORA</span>
+      <section id="decants" class="home-section decants-section" aria-labelledby="decants-title">
+        <div class="home-section__head">
+          <div>
+            <p class="home-eyebrow">The discovery edit / 03</p>
+            <h2 id="decants-title">Decants</h2>
           </div>
-        </div>
-      </div>
-    </section>
-    <section
-      id="special"
-      class="py-32 px-6 md:px-12 bg-white text-black relative"
-    >
-      <div class="max-w-7xl mx-auto">
-        <div class="text-center mb-24">
-          <span
-            class="text-xs font-bold tracking-[0.5em] uppercase text-gray-500 mb-6 block"
-            >Exclusive to Mystora</span
-          >
-          <h2
-            class="text-4xl sm:text-5xl md:text-7xl mb-6 font-gotham-light tracking-[0.06em] uppercase"
-          >
-            The Special Collection
-          </h2>
-
-          <p class="max-w-md mx-auto text-gray-600 leading-relaxed">
-            Unique blends crafted by our master perfumers. Not a clone, but an
-            original statement.
-          </p>
+          <p class="home-section__intro">Every Mystora fragrance in a travel-ready 10 ml bottle. Live with the scent before choosing your full size.</p>
         </div>
 
-        <div
-          id="special-grid"
-          class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 lg:gap-12"
-        ></div>
-      </div>
-    </section>
-
-    <!-- Why You'll Love Mystora + Our Mission (combined) -->
-    <section class="bg-white text-black py-28 px-6 md:px-12">
-      <div class="max-w-7xl mx-auto">
-        <!-- Heading -->
-        <div class="text-center mb-16">
-          <h2
-            class="text-4xl md:text-6xl font-gotham-light tracking-[0.06em] uppercase"
-          >
-            Why You'll Love Mystora
-          </h2>
-          <p
-            class="mt-4 text-sm md:text-base text-gray-600 tracking-wide font-gotham-extralight"
-          >
-            Premium inspired scents and originals, crafted to feel expensive
-            without the price tag.
-          </p>
-        </div>
-
-        <!-- Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <!-- Card 1 -->
-          <div class="bg-neutral-100 border border-neutral-200 p-10 md:p-12">
-            <h3
-              class="text-2xl md:text-3xl font-gotham-light tracking-[0.1em] uppercase text-center"
-            >
-              Luxury Inspired, Done Right
-            </h3>
-            <p
-              class="mt-6 text-center text-gray-700 leading-relaxed font-gotham-extralight text-[15px] md:text-[16px]"
-            >
-              Love the vibe of designer fragrances but not the price. Mystora
-              captures the same mood and signature style, made for everyday
-              wear.
-            </p>
-          </div>
-
-          <!-- Card 2 -->
-          <div class="bg-neutral-100 border border-neutral-200 p-10 md:p-12">
-            <h3
-              class="text-2xl md:text-3xl font-gotham-light tracking-[0.1em] uppercase text-center"
-            >
-              Strong Performance
-            </h3>
-            <p
-              class="mt-6 text-center text-gray-700 leading-relaxed font-gotham-extralight text-[15px] md:text-[16px]"
-            >
-              Built to last through your day. From lectures to late nights, our
-              blends are designed to stay present, not disappear in an hour.
-            </p>
-          </div>
-
-          <!-- Card 3 -->
-          <div class="bg-neutral-100 border border-neutral-200 p-10 md:p-12">
-            <h3
-              class="text-2xl md:text-3xl font-gotham-light tracking-[0.1em] uppercase text-center"
-            >
-              Try Before You Commit
-            </h3>
-            <p
-              class="mt-6 text-center text-gray-700 leading-relaxed font-gotham-extralight text-[15px] md:text-[16px]"
-            >
-              Not sure what fits you. Start with 10ml to test it properly, then
-              move up to 50ml or 100ml once you are sure.
-            </p>
-          </div>
-
-          <!-- Card 4 -->
-          <div class="bg-neutral-100 border border-neutral-200 p-10 md:p-12">
-            <h3
-              class="text-2xl md:text-3xl font-gotham-light tracking-[0.1em] uppercase text-center"
-            >
-              Easy Ordering
-            </h3>
-            <p
-              class="mt-6 text-center text-gray-700 leading-relaxed font-gotham-extralight text-[15px] md:text-[16px]"
-            >
-              See the scent, pick your size, and order in seconds through
-              WhatsApp. Fast replies, clear pricing, and smooth delivery across
-              Sri Lanka.
-            </p>
-          </div>
-        </div>
-
-        <!-- Mission -->
-        <div class="mt-24 grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
-          <!-- Image (4:5) -->
-          <div class="overflow-hidden border border-neutral-200 bg-neutral-100">
-            <div class="aspect-[4/5] w-full">
-              <img
-                src="assets/img/warga.png"
-                alt="Mystora mission"
-                class="w-full h-full object-cover"
-              />
+        <div class="special-story-grid decants-story-grid">
+          <article class="special-story-card decants-story-card--video">
+            <video autoplay muted loop playsinline preload="metadata" aria-label="Mystora 10 millilitre decants campaign film">
+              <source src="/assets/videos/decants_video.mp4" type="video/mp4" />
+            </video>
+            <div class="special-story-card__shade"></div>
+            <div class="special-story-card__copy">
+              <h3>10 ml. Full expression.</h3>
             </div>
-          </div>
+          </article>
 
-          <!-- Text -->
-          <div class="max-w-xl">
-            <p
-              class="text-[10px] tracking-[0.45em] uppercase text-gray-500 font-gotham-light mb-4"
-            >
-              Our Mission
-            </p>
-
-            <h3
-              class="text-4xl md:text-5xl font-gotham-light tracking-[0.06em] uppercase mb-8"
-            >
-              Luxury, made reachable
-            </h3>
-
-            <div
-              class="space-y-6 text-gray-700 leading-relaxed font-gotham-extralight text-[15px] md:text-[16px]"
-            >
-              <p>
-                Mystora exists to bring that high-end feeling to everyone.
-                Inspired scents when you want the designer vibe, and originals
-                when you want something only you wear.
-              </p>
-              <p>
-                We focus on blends that smell premium, perform well, and feel
-                confident from the first spray to the last.
-              </p>
-              <p>
-                Simple choices, clean presentation, and sizes that let you test
-                properly before you commit.
-              </p>
+          <a class="special-story-card decants-story-card--image" href="/shop/?size=10ml" aria-label="Browse 10 millilitre decants">
+            <img src="/assets/img/warga.png" alt="Mystora fragrance collection available in 10 millilitre decants" loading="lazy" />
+            <div class="special-story-card__shade"></div>
+            <div class="special-story-card__copy">
+              <span>Start small</span>
+              <h3>Browse decants</h3>
+              <span class="special-story-card__link">Shop 10 ml <b>&#8599;</b></span>
             </div>
-
-            <!-- Buttons (only once) -->
-            <div class="mt-10 flex flex-wrap gap-3">
-              <a
-                href="shop/"
-                class="inline-block bg-black text-white px-8 py-4 text-[11px] uppercase tracking-[0.35em] font-gotham-light hover:bg-neutral-900 transition-colors"
-              >
-                Explore the collection
-              </a>
-            </div>
-          </div>
+          </a>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <footer
-      class="bg-mystora-black border-t border-gray-900 py-20 px-6 text-center"
-    >
-      <img
-        src="assets/img/logo.png"
-        alt="Mystora"
-        class="w-16 mx-auto mb-8 invert opacity-50"
-      />
-      <p class="font-brand text-3xl text-white mb-8">MYSTORA</p>
-      <div
-        class="flex justify-center gap-8 text-gray-500 text-xs tracking-widest uppercase mb-12"
-      >
-        <a
-          href="https://www.instagram.com/mystora.lk/"
-          class="hover:text-white transition-colors"
-          >Instagram</a
-        >
-        <a
-          href="https://api.whatsapp.com/send/?phone=94768253595&text"
-          class="hover:text-white transition-colors"
-          >WhatsApp</a
-        >
-        <a
-          href="https://www.tiktok.com/@mystora.lk"
-          class="hover:text-white transition-colors"
-          >TikTok</a
-        >
+      <section id="ritual" class="home-section ritual-section" aria-labelledby="ritual-title">
+        <div class="home-section__head">
+          <div>
+            <p class="home-eyebrow">Choose your ritual / 04</p>
+            <h2 id="ritual-title">One scent. Your pace.</h2>
+          </div>
+          <p class="home-section__intro">Begin with a discovery size, make it your everyday signature, or keep your favourite close for longer.</p>
+        </div>
+
+        <div class="ritual-rail" data-static-rail>
+          <a class="ritual-card" href="/shop/?size=10ml">
+            <span class="ritual-card__number">10</span><span class="ritual-card__unit">ml</span>
+            <div><h3>Discover</h3><p>Wear it through your day before you decide.</p></div>
+            <b>&#8594;</b>
+          </a>
+          <a class="ritual-card ritual-card--warm" href="/shop/?size=50ml">
+            <span class="ritual-card__number">50</span><span class="ritual-card__unit">ml</span>
+            <div><h3>Live with it</h3><p>The balanced size for an everyday signature.</p></div>
+            <b>&#8594;</b>
+          </a>
+          <a class="ritual-card ritual-card--dark" href="/shop/?size=100ml">
+            <span class="ritual-card__number">100</span><span class="ritual-card__unit">ml</span>
+            <div><h3>Make it yours</h3><p>More of the fragrance you always return to.</p></div>
+            <b>&#8594;</b>
+          </a>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="site-footer" id="site-footer">
+      <p class="site-footer__wordmark" aria-label="Mystora dot L K">MYSTORA.LK</p>
+
+      <div class="site-footer__grid">
+        <div class="site-footer__newsletter">
+          <p class="home-eyebrow">Private notes from Mystora</p>
+          <h2>New drops, quietly delivered.</h2>
+          <form class="footer-signup" id="footer-signup">
+            <label class="sr-only" for="footer-email">Email address</label>
+            <input id="footer-email" name="email" type="email" autocomplete="email" placeholder="Email address" required />
+            <button type="submit">Join the list &#8594;</button>
+          </form>
+          <p class="footer-signup__status" id="footer-signup-status" role="status"></p>
+        </div>
+
+        <nav class="site-footer__links" aria-label="Shop links">
+          <p>Shop</p>
+          <a href="/shop/">All fragrances</a>
+          <a href="/shop/?q=for%20him">For him</a>
+          <a href="/shop/?q=for%20her">For her</a>
+          <a href="/shop/?category=special">Special Collection</a>
+        </nav>
+
+        <nav class="site-footer__links" aria-label="Help links">
+          <p>Help & contact</p>
+          <a href="https://api.whatsapp.com/send/?phone=94768253595&text=Hi%20Mystora%2C%20I%20need%20some%20help">WhatsApp us</a>
+          <a href="https://www.instagram.com/mystora.lk/">Instagram</a>
+          <a href="https://www.facebook.com/profile.php?id=61581027238674">Facebook</a>
+          <a href="https://www.tiktok.com/@mystora.lk">TikTok</a>
+        </nav>
       </div>
-      <p class="text-gray-800 text-[10px] uppercase tracking-widest">
-        &copy; 2026 Mystora Perfumes. Sri Lanka.
-      </p>
+
+      <div class="site-footer__bottom">
+        <p>&copy; 2026 Mystora Perfumes. Sri Lanka.</p>
+        <p>The secret in every drop.</p>
+        <a href="#hero-section">Back to top &#8593;</a>
+      </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script type="module" src="/js/main.js"></script>
   </body>
 </html>
